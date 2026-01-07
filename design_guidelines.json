@@ -1,0 +1,6 @@
+{
+  "palette": {"primary": "#d97706", "surface": "#fffbeb", "text": "#292524"},
+  "type": {"heading": "Inter", "body": "Inter"},
+  "spacing": 8,
+  "radius": 12
+}
