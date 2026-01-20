@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from enum import Enum
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
+from typing import Optional
 import os
 
 load_dotenv()
@@ -13,6 +15,25 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 class AnimalType(str, Enum):
     CATTLE = "cattle"
     BUFFALO = "buffalo"
+
+class BreedInfo(BaseModel):
+    name: str
+    type: AnimalType
+    origin: str
+    traits: list[str]
+    purpose: str
+    avg_milk_yield_liters: int
+
+class RecognitionResult(BaseModel):
+    breed: str
+    confidence: float
+    animal_type: AnimalType
+    traits: list[str]
+    origin: str
+
+class RecognizeResponse(BaseModel):
+    results: list[RecognitionResult]
+    top_match: RecognitionResult
 
 BREED_CATALOG = {
     "Gir": {"type": AnimalType.CATTLE, "origin": "Gujarat", "traits": ['Hump', 'Pendulous ears', 'Reddish-brown coat'], "purpose": "Dairy", "avg_milk_yield_liters": 2100},
@@ -39,13 +60,11 @@ DB_NAME = os.getenv("DB_NAME", "cattleman")
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
-
 @app.on_event("startup")
 async def startup():
     count = await db.breeds.count_documents({})
     if count == 0:
         await db.breeds.insert_many([{"name": k, **v} for k, v in BREED_CATALOG.items()])
-
 
 @app.get("/api/breeds")
 async def get_breeds():
@@ -53,3 +72,7 @@ async def get_breeds():
     async for doc in db.breeds.find({}, projection={"_id": False}):
         breeds.append(doc)
     return {"breeds": breeds}
+
+@app.post("/api/recognize", response_model=RecognizeResponse)
+async def recognize_breed():
+    raise HTTPException(status_code=501, detail="AI pipeline not yet implemented")
