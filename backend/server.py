@@ -45,3 +45,11 @@ async def startup():
     count = await db.breeds.count_documents({})
     if count == 0:
         await db.breeds.insert_many([{"name": k, **v} for k, v in BREED_CATALOG.items()])
+
+
+@app.get("/api/breeds")
+async def get_breeds():
+    breeds = []
+    async for doc in db.breeds.find({}, projection={"_id": False}):
+        breeds.append(doc)
+    return {"breeds": breeds}
