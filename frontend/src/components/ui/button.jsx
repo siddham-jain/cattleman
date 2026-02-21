@@ -1,3 +1,4 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-export function Button({ className, ...props }) { return <div className={cn('', className)} {...props} />; }
+import * as React from 'react'; import { cn } from '@/lib/utils';
+const buttonVariants = { default: 'bg-amber-600 text-white hover:bg-amber-700 shadow-sm', outline: 'border border-stone-300 bg-white hover:bg-stone-50', ghost: 'hover:bg-stone-100', destructive: 'bg-red-600 text-white hover:bg-red-700' };
+const Button = React.forwardRef(({ className, variant='default', size='default', disabled, children, ...props }, ref) => (<button ref={ref} disabled={disabled} className={cn('inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-amber-500 h-10 px-4 py-2 text-sm', buttonVariants[variant], disabled&&'opacity-50 cursor-not-allowed', className)} {...props}>{children}</button>));
+Button.displayName='Button'; export { Button, buttonVariants };
