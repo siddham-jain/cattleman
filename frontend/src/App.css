@@ -1,4 +1,6 @@
 @tailwind base; @tailwind components; @tailwind utilities;
-@layer base { body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; } }
-@keyframes fade-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-.animate-in { animation: fade-in 0.35s ease-out; }
+@layer base { :root { --brand: #d97706; --brand-light: #fbbf24; } body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; } }
+@keyframes fade-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slide-in { from { opacity:0; transform:translateX(24px); } to { opacity:1; transform:translateX(0); } }
+.animate-in { animation: fade-in 0.4s ease-out; } .animate-slide { animation: slide-in 0.3s ease-out; }
+.confidence-bar { transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
