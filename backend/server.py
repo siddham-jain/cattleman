@@ -6,10 +6,10 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from typing import Optional
-import random, os
+import random, os, uuid
 
 load_dotenv()
-app = FastAPI(title="Cattleman API", version="0.2.0")
+app = FastAPI(title="Cattleman API", version="0.3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 class AnimalType(str, Enum): CATTLE='cattle'; BUFFALO='buffalo'
@@ -45,7 +45,8 @@ async def startup():
 
 @app.get("/api/breeds")
 async def get_breeds():
-    breeds=[]; async for doc in db.breeds.find({},projection={'_id':False}): breeds.append(doc); return {'breeds':breeds}
+    breeds=[]; async for doc in db.breeds.find({},projection={'_id':False}): breeds.append(doc)
+    return {'breeds':breeds}
 
 def _simulate_ai(catalog,top_n=4):
     names=list(catalog.keys()); top=random.choice(names); info=catalog[top]
@@ -60,5 +61,14 @@ def _simulate_ai(catalog,top_n=4):
 async def recognize_breed(file:UploadFile=File(...)):
     if not file.content_type or not file.content_type.startswith("image/"): raise HTTPException(400,"Must be an image")
     if not await file.read(): raise HTTPException(400,"Empty file")
-    results=_simulate_ai(BREED_CATALOG)
-    return RecognizeResponse(results=results,top_match=results[0],request_id=f'req_{random.randint(10000,99999)}')
+    results=_simulate_ai(BREED_CATALOG); req_id=str(uuid.uuid4())[:8]
+    await db.history.insert_one({"request_id":req_id,"filename":file.filename or "unknown","top_breed":results[0].breed,"confidence":results[0].confidence,"results":[r.dict() for r in results],"timestamp":datetime.now(timezone.utc)})
+    return RecognizeResponse(results=results,top_match=results[0],request_id=req_id)
+
+@app.get("/api/history",response_model=HistoryResponse)
+async def get_history(limit:int=Query(20,ge=1,le=100),offset:int=Query(0,ge=0)):
+    total=await db.history.count_documents({})
+    cursor=db.history.find({}).sort("timestamp",-1).skip(offset).limit(limit)
+    entries=[]; async for doc in cursor:
+        entries.append(HistoryEntry(id=doc['request_id'],filename=doc['filename'],top_breed=doc['top_breed'],confidence=doc['confidence'],timestamp=doc['timestamp'],results=[RecognitionResult(**r) for r in doc['results']]))
+    return HistoryResponse(entries=entries,total=total)
