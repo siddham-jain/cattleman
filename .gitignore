@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 .vscode/
 generate_history.sh
+test_reports/*.xml
+test_reports/*.html
