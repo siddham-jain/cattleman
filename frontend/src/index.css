@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root { --brand: #d97706; --brand-light: #fbbf24; --brand-dark: #92400e; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+}
+
+@media (max-width: 640px) {
+  .upload-zone { padding: 2rem 1rem; }
+  .result-card { border-radius: 0; }
+}
