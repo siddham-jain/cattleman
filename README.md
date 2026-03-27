@@ -1,17 +1,43 @@
 # Cattleman — AI Cattle & Buffalo Breed Recognition
 
-A PoC web app that identifies Indian cattle and buffalo breeds from photographs.
+A proof-of-concept web application that identifies Indian cattle and buffalo
+breeds from photographs using an AI image analysis pipeline.
+
+## Features
+
+- Drag-and-drop image upload with preview
+- AI-powered breed identification with confidence scores
+- Detailed breed information (origin, traits, milk yield)
+- Recognition history with pagination
+- Responsive design for mobile and desktop
+- 12 supported Indian breeds (7 cattle, 5 buffalo)
 
 ## Stack
 
-| Layer    | Technology                         |
-|----------|------------------------------------|
-| Backend  | Python 3, FastAPI, MongoDB (motor) |
-| Frontend | React 18, Tailwind CSS, shadcn/ui  |
+| Layer    | Technology                    |
+|----------|-------------------------------|
+| Backend  | Python 3, FastAPI, MongoDB   |
+| Frontend | React 18, Tailwind, shadcn/ui |
+| AI       | Breed recognition pipeline    |
 
-## Supported Breeds
+## Quick Start
 
-Gir, Sahiwal, Red Sindhi, Tharparkar, Kankrej, Ongole, Hariana,
-Murrah, Jaffarabadi, Surti, Mehsana, Nili-Ravi
+```bash
+# Backend
+cd backend && pip install -r requirements.txt && uvicorn server:app --reload
 
-## License — MIT
+# Frontend
+cd frontend && npm install && npm start
+```
+
+## API Endpoints
+
+| Method | Path           | Description                  |
+|--------|----------------|------------------------------|
+| GET    | /api/breeds    | List all 12 breeds           |
+| POST   | /api/recognize | Upload image for recognition |
+| GET    | /api/history   | View past recognition results|
+
+## License
+
+MIT — see LICENSE file for details.
