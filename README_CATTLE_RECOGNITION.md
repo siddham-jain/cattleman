@@ -51,3 +51,24 @@ cd frontend
 npm install
 npm start
 ```
+
+## Error Handling
+
+The API returns detailed error messages for:
+- Invalid file types
+- Empty uploads
+- Oversized images (>5 MB)
+- Missing files
+
+All errors follow the format:
+```json
+{"detail": "Human-readable error message"}
+```
+
+## Environment Variables
+
+| Variable         | Default                        | Description       |
+|-----------------|--------------------------------|-------------------|
+| MONGO_URL       | mongodb://localhost:27017      | MongoDB URI       |
+| DB_NAME         | cattleman                      | Database name     |
+| REACT_APP_API_URL| http://localhost:8000         | Backend URL       |
