@@ -41,3 +41,17 @@ cd frontend && npm install && npm start
 ## License
 
 MIT — see LICENSE file for details.
+
+## Development
+
+```bash
+# Run tests
+cd tests && pytest -v
+
+# Lint backend
+pip install ruff && ruff check backend/
+```
+
+## Contributing
+
+Pull requests welcome. See image_testing.md for testing guidelines.
