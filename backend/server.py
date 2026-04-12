@@ -9,8 +9,13 @@ from typing import Optional
 import random, os, uuid
 
 load_dotenv()
-app = FastAPI(title="Cattleman API", version="0.3.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+app = FastAPI(title="Cattleman API", version="0.3.0",
+    description="Indian cattle & buffalo breed recognition API")
+
+# Production-ready CORS
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["*"], allow_headers=["*"])
 
 class AnimalType(str, Enum): CATTLE='cattle'; BUFFALO='buffalo'
 class RecognitionResult(BaseModel):
@@ -59,8 +64,13 @@ def _simulate_ai(catalog,top_n=4):
 
 @app.post("/api/recognize",response_model=RecognizeResponse)
 async def recognize_breed(file:UploadFile=File(...)):
-    if not file.content_type or not file.content_type.startswith("image/"): raise HTTPException(400,"Must be an image")
-    if not await file.read(): raise HTTPException(400,"Empty file")
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(400,detail="Only image files (PNG, JPG, WebP) are accepted")
+    contents = await file.read()
+    if not contents:
+        raise HTTPException(400,detail="Uploaded file is empty")
+    if len(contents) > 5*1024*1024:
+        raise HTTPException(400,detail="File exceeds maximum size of 5 MB")
     results=_simulate_ai(BREED_CATALOG); req_id=str(uuid.uuid4())[:8]
     await db.history.insert_one({"request_id":req_id,"filename":file.filename or "unknown","top_breed":results[0].breed,"confidence":results[0].confidence,"results":[r.dict() for r in results],"timestamp":datetime.now(timezone.utc)})
     return RecognizeResponse(results=results,top_match=results[0],request_id=req_id)
