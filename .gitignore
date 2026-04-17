@@ -4,6 +4,9 @@ __pycache__/
 *.pyc
 .DS_Store
 .vscode/
+.idea/
 generate_history.sh
-test_reports/*.xml
-test_reports/*.html
+*.log
+test_reports/
+build/
+dist/
