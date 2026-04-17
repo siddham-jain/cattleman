@@ -1,1 +1,1 @@
-{"$schema":"https://ui.shadcn.com/schema.json","style":"default","rsc":false,"tsx":false,"tailwind":{"config":"tailwind.config.js","css":"src/index.css","baseColor":"amber","cssVariables":false},"aliases":{"components":"@/components","utils":"@/lib/utils"}}
+{"$schema":"https://ui.shadcn.com/schema.json","style":"default","rsc":false,"tsx":false,"tailwind":{"config":"tailwind.config.js","css":"src/index.css","baseColor":"amber","cssVariables":true},"aliases":{"components":"@/components","utils":"@/lib/utils","ui":"@/components/ui","hooks":"@/hooks"}}
