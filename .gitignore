@@ -10,3 +10,12 @@ generate_history.sh
 test_reports/
 build/
 dist/
+
+# ML workspace
+.venv/
+ml/data/
+ml/runs/
+ml/models/
+*.pt
+*.pth
+*.onnx
