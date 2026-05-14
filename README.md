@@ -1,4 +1,4 @@
-# Cattleman — AI Cattle & Buffalo Breed Recognition
+# Cattleman - AI Cattle & Buffalo Breed Recognition
 
 A proof-of-concept web application that identifies Indian cattle and buffalo
 breeds from photographs using an AI image analysis pipeline.
