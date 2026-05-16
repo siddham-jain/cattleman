@@ -32,17 +32,35 @@ def hamming(a: np.ndarray, b: np.ndarray) -> int:
 
 
 def cluster(items, threshold: int = DUPLICATE_THRESHOLD):
-    """Greedily group (key, hash) pairs into near-duplicate clusters.
+    """Group (key, hash) pairs into near-duplicate clusters.
 
-    Greedy single-pass clustering is adequate here because augmented copies form
-    tight, well-separated groups; it is O(n * clusters) rather than O(n^2).
+    Uses connected components over the "within threshold" relation rather than
+    greedy single-pass assignment. Greedy grouping depends on input order —
+    near-duplicate is not transitive, so A~B and B~C does not imply A~C — which
+    made the audit and the splitter disagree about borderline pairs and left a
+    handful of source photos spanning splits.
+
+    Chaining merges A and C when both match B. That errs towards over-merging,
+    which is the safe direction: a too-large group costs a little split balance,
+    while a too-small one puts a photo's variants on both sides of the split.
     """
-    clusters = []
-    for key, digest in items:
-        for group in clusters:
-            if hamming(digest, group[0][1]) <= threshold:
-                group.append((key, digest))
-                break
-        else:
-            clusters.append([(key, digest)])
-    return clusters
+    items = list(items)
+    parent = list(range(len(items)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i in range(len(items)):
+        for j in range(i + 1, len(items)):
+            if hamming(items[i][1], items[j][1]) <= threshold:
+                ri, rj = find(i), find(j)
+                if ri != rj:
+                    parent[ri] = rj
+
+    groups = {}
+    for idx, item in enumerate(items):
+        groups.setdefault(find(idx), []).append(item)
+    return list(groups.values())
