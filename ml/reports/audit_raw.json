@@ -1,0 +1,108 @@
+{
+  "root": "ml/data/raw",
+  "images": 598,
+  "unreadable": 0,
+  "per_breed": {
+    "Gir": 52,
+    "Hariana": 52,
+    "Jaffarabadi": 52,
+    "Kankrej": 52,
+    "Mehsana": 26,
+    "Murrah": 52,
+    "Nili-Ravi": 52,
+    "Ongole": 52,
+    "Red Sindhi": 52,
+    "Sahiwal": 52,
+    "Surti": 52,
+    "Tharparkar": 52
+  },
+  "distinct_sources": 465,
+  "cross_split_groups": 48,
+  "images_in_leaking_groups": 127,
+  "per_breed_detail": [
+    {
+      "breed": "Gir",
+      "images": 52,
+      "sources": 42,
+      "cross_split_groups": 5,
+      "affected_images": 13
+    },
+    {
+      "breed": "Hariana",
+      "images": 52,
+      "sources": 35,
+      "cross_split_groups": 5,
+      "affected_images": 16
+    },
+    {
+      "breed": "Jaffarabadi",
+      "images": 52,
+      "sources": 45,
+      "cross_split_groups": 5,
+      "affected_images": 11
+    },
+    {
+      "breed": "Kankrej",
+      "images": 52,
+      "sources": 42,
+      "cross_split_groups": 3,
+      "affected_images": 8
+    },
+    {
+      "breed": "Mehsana",
+      "images": 26,
+      "sources": 17,
+      "cross_split_groups": 1,
+      "affected_images": 6
+    },
+    {
+      "breed": "Murrah",
+      "images": 52,
+      "sources": 36,
+      "cross_split_groups": 6,
+      "affected_images": 16
+    },
+    {
+      "breed": "Nili-Ravi",
+      "images": 52,
+      "sources": 43,
+      "cross_split_groups": 4,
+      "affected_images": 11
+    },
+    {
+      "breed": "Ongole",
+      "images": 52,
+      "sources": 40,
+      "cross_split_groups": 7,
+      "affected_images": 17
+    },
+    {
+      "breed": "Red Sindhi",
+      "images": 52,
+      "sources": 46,
+      "cross_split_groups": 1,
+      "affected_images": 2
+    },
+    {
+      "breed": "Sahiwal",
+      "images": 52,
+      "sources": 37,
+      "cross_split_groups": 3,
+      "affected_images": 7
+    },
+    {
+      "breed": "Surti",
+      "images": 52,
+      "sources": 39,
+      "cross_split_groups": 6,
+      "affected_images": 14
+    },
+    {
+      "breed": "Tharparkar",
+      "images": 52,
+      "sources": 43,
+      "cross_split_groups": 2,
+      "affected_images": 6
+    }
+  ]
+}
