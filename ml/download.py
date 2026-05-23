@@ -1,9 +1,14 @@
 """Download the 12 target breeds from the source dataset into ml/data/raw/.
 
-Images land in ml/data/raw/<Breed>/ with their original filenames preserved. The
-filename encodes the upstream split (e.g. Cattle_Gir_test_002_orig.jpg), which
-ml/audit.py needs in order to measure leakage in the published splits. We do not
-reuse those splits — ml/splits.py builds our own.
+Source is `mr-rxa/Cattle-Buffalo-Datatset` (7,014 images, 68 Indian breed
+classes). We previously used `SynthAIzer/indian-cattle-buffalo-breeds`; it was
+dropped because its ~52 images per breed proved to be roughly 4 photographs
+augmented into 52 files, which cannot support a held-out evaluation. See
+ml/reports/dataset_audit.md.
+
+That repository nests breeds under two different top-level collections, and the
+sparse "* Breeds" tier holds only 7-15 images per class, so we select by explicit
+path rather than by breed name alone.
 
 Usage:  python ml/download.py
 """
@@ -17,25 +22,31 @@ from pathlib import Path
 
 from breeds import TARGET_BREEDS
 
-DATASET = "SynthAIzer/indian-cattle-buffalo-breeds"
+DATASET = "mr-rxa/Cattle-Buffalo-Datatset"
 RESOLVE = f"https://huggingface.co/datasets/{DATASET}/resolve/main/"
 TREE = f"https://huggingface.co/api/datasets/{DATASET}/tree/main?recursive=true"
+IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp")
 
-# Our breed names -> upstream class directory names.
+# Our breed name -> upstream directory name. All of these live in the dense
+# "Cattle Images" / "Buffalo Images" collections.
 SOURCE_DIRS = {
-    "Gir": "Cattle_Gir",
-    "Sahiwal": "Cattle_Sahiwal",
-    "Red Sindhi": "Cattle_Red_Sindhi",
-    "Tharparkar": "Cattle_Tharparkar",
-    "Kankrej": "Cattle_Kankrej",
-    "Ongole": "Cattle_Ongole",
-    "Hariana": "Cattle_Hariana",
-    "Murrah": "Buffalo_MURRAH",
-    "Jaffarabadi": "Buffalo_JAFFARABADI",
-    "Surti": "Buffalo_SURTI",
-    "Mehsana": "Buffalo_MEHSANA",
-    "Nili-Ravi": "Buffalo_NILI_RAVI",
+    "Gir": "Gir",
+    "Rathi": "Rathi",
+    "Red Sindhi": "Red_Sindhi",
+    "Khillari": "Khillari",
+    "Kankrej": "Kankrej",
+    "Ongole": "Ongole",
+    "Hariana": "Hariana",
+    "Murrah": "Murrah",
+    "Jaffarabadi": "Jaffrabadi",
+    "Surti": "Surti",
+    "Mehsana": "Mehsana",
+    "Nili-Ravi": "Nili_Ravi",
 }
+
+# The sparse tier duplicates some breed names with only a handful of images;
+# mixing it in would add near-nothing and skew class counts.
+ALLOWED_COLLECTIONS = ("Cattle Images", "Buffalo Images")
 
 
 def list_remote_images():
@@ -44,18 +55,17 @@ def list_remote_images():
         req = urllib.request.Request(url, headers={"User-Agent": "cattleman"})
         with urllib.request.urlopen(req, timeout=60) as resp:
             paths += [e["path"] for e in json.load(resp)
-                      if e["type"] == "file"
-                      and e["path"].lower().endswith((".jpg", ".jpeg", ".png"))]
+                      if e["type"] == "file" and e["path"].lower().endswith(IMAGE_SUFFIXES)]
             link = resp.headers.get("Link", "")
         match = re.search(r'<([^>]+)>;\s*rel="next"', link)
         url = match.group(1) if match else None
     return paths
 
 
-def download_one(remote_path: Path, dest: Path):
+def download_one(remote_path: str, dest: Path):
     if dest.exists() and dest.stat().st_size > 0:
         return False
-    req = urllib.request.Request(RESOLVE + urllib.parse.quote(str(remote_path)),
+    req = urllib.request.Request(RESOLVE + urllib.parse.quote(remote_path),
                                  headers={"User-Agent": "cattleman"})
     with urllib.request.urlopen(req, timeout=90) as resp:
         dest.write_bytes(resp.read())
@@ -65,32 +75,31 @@ def download_one(remote_path: Path, dest: Path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, default=Path("ml/data/raw"))
-    parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument("--workers", type=int, default=12)
     args = parser.parse_args()
 
     remote = list_remote_images()
     if not remote:
         raise SystemExit("Dataset tree API returned no images")
 
-    missing = [b for b in TARGET_BREEDS if b not in SOURCE_DIRS]
-    if missing:
-        raise SystemExit(f"No source directory mapped for: {missing}")
-
     jobs, total = [], 0
     for breed in TARGET_BREEDS:
-        src = SOURCE_DIRS[breed]
-        paths = [p for p in remote if f"/{src}/" in p]
+        source = SOURCE_DIRS[breed]
+        paths = [p for p in remote
+                 if p.split("/")[-2] == source
+                 and any(f"/{c}/" in p for c in ALLOWED_COLLECTIONS)]
         if not paths:
-            raise SystemExit(f"Upstream directory {src} contained no images")
+            raise SystemExit(f"No images found upstream for {breed} (dir {source!r})")
+
         dest_dir = args.out / breed
         dest_dir.mkdir(parents=True, exist_ok=True)
-        for p in paths:
-            jobs.append((p, dest_dir / Path(p).name))
+        for path in paths:
+            jobs.append((path, dest_dir / Path(path).name))
         total += len(paths)
         print(f"  {breed:<14} {len(paths):>4} images")
 
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        fetched = sum(pool.map(lambda j: download_one(Path(j[0]), j[1]), jobs))
+        fetched = sum(pool.map(lambda job: download_one(job[0], job[1]), jobs))
 
     print(f"\n{total} images across {len(TARGET_BREEDS)} breeds "
           f"({fetched} newly downloaded) -> {args.out}")
