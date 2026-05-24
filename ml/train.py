@@ -78,6 +78,9 @@ def main():
     parser.add_argument("--label-smoothing", type=float, default=0.1)
     parser.add_argument("--img-size", type=int, default=224)
     parser.add_argument("--num-workers", type=int, default=2)
+    parser.add_argument("--strong-aug", action="store_true",
+                        help="RandAugment instead of plain rotation")
+    parser.add_argument("--erasing", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default=None)
     parser.add_argument("--tag", default=None, help="suffix for the checkpoint filename")
@@ -87,7 +90,8 @@ def main():
     device = pick_device(args.device)
 
     loaders, datasets = build_dataloaders(args.splits, args.batch_size, args.img_size,
-                                          args.num_workers)
+                                          args.num_workers, strong_aug=args.strong_aug,
+                                          erasing=args.erasing)
     print(f"arch={args.arch}  device={device}  classes={len(TARGET_BREEDS)}")
     print(f"train={len(datasets['train'])}  val={len(datasets['val'])}  "
           f"test={len(datasets['test'])} (held out)\n")

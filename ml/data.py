@@ -19,27 +19,39 @@ IMAGENET_STD = (0.229, 0.224, 0.225)
 DEFAULT_IMG_SIZE = 224
 
 
-def build_transforms(img_size: int = DEFAULT_IMG_SIZE):
+def build_transforms(img_size: int = DEFAULT_IMG_SIZE, strong: bool = False,
+                     erasing: float = 0.0):
     """Train-time augmentation and deterministic eval preprocessing.
 
-    The source images already include augmented copies, but those variants are
-    fixed — the same crop every epoch. Augmenting again at load time gives the
-    model a different view each epoch, which matters with only ~35 training
-    images per breed.
+    Augmenting at load time gives the model a different view each epoch, which
+    matters with roughly 75 training images per breed.
 
-    Rotation and jitter stay mild on purpose: breed cues are coat colour and
-    horn geometry, and aggressive colour distortion erases exactly the signal
-    that separates, say, Red Sindhi from Sahiwal. No vertical flip — cattle are
-    not upside down in the field.
+    Colour distortion stays mild even in the strong setting: breed cues are coat
+    colour and horn geometry, and aggressive hue shifts erase exactly the signal
+    that separates Red Sindhi from Rathi. No vertical flip — cattle are not
+    upside down in the field.
+
+    `strong` adds RandAugment and random erasing. Baseline training drove train
+    accuracy to 1.000 while validation stalled near 0.62, so the extra
+    regularisation targets that gap rather than the underlying fit.
     """
-    train = transforms.Compose([
-        transforms.RandomResizedCrop(img_size, scale=(0.7, 1.0), ratio=(0.8, 1.25)),
+    train_steps = [
+        transforms.RandomResizedCrop(img_size, scale=(0.6, 1.0), ratio=(0.75, 1.33)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(12),
+    ]
+    if strong:
+        # magnitude 7 of 30: enough to regularise without destroying coat colour
+        train_steps.append(transforms.RandAugment(num_ops=2, magnitude=7))
+    else:
+        train_steps.append(transforms.RandomRotation(12))
+    train_steps += [
         transforms.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.15, hue=0.02),
         transforms.ToTensor(),
         transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
-    ])
+    ]
+    if erasing > 0:
+        train_steps.append(transforms.RandomErasing(p=erasing, scale=(0.02, 0.15)))
+    train = transforms.Compose(train_steps)
     evaluate = transforms.Compose([
         transforms.Resize(int(img_size * 1.14)),
         transforms.CenterCrop(img_size),
@@ -77,8 +89,9 @@ def _balanced_sampler(dataset):
 
 def build_dataloaders(root: Path = Path("ml/data/splits"), batch_size: int = 32,
                       img_size: int = DEFAULT_IMG_SIZE, num_workers: int = 4,
-                      balanced: bool = True):
-    train_tf, eval_tf = build_transforms(img_size)
+                      balanced: bool = True, strong_aug: bool = False,
+                      erasing: float = 0.0):
+    train_tf, eval_tf = build_transforms(img_size, strong_aug, erasing)
     datasets = {
         "train": _ordered_dataset(root / "train", train_tf),
         "val": _ordered_dataset(root / "val", eval_tf),
