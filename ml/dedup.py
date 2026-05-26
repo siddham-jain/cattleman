@@ -61,17 +61,19 @@ def embed_paths(paths, device: torch.device | None = None, batch_size: int = 32)
     return torch.cat(chunks) if chunks else torch.empty(0)
 
 
-def cluster_paths(paths, threshold: float = DUPLICATE_THRESHOLD,
-                  device: torch.device | None = None):
-    """Group paths into near-duplicate clusters via connected components."""
-    paths = list(paths)
-    if not paths:
+def cluster_embeddings(keys, embeddings, threshold: float = DUPLICATE_THRESHOLD):
+    """Group keys into near-duplicate clusters via connected components.
+
+    Takes precomputed embeddings so callers that need several groupings over the
+    same images — global conflict detection, then per-breed grouping — pay the
+    forward pass only once.
+    """
+    keys = list(keys)
+    if not keys:
         return []
 
-    embeddings = embed_paths(paths, device)
     similarity = embeddings @ embeddings.T
-
-    parent = list(range(len(paths)))
+    parent = list(range(len(keys)))
 
     def find(i):
         while parent[i] != i:
@@ -79,17 +81,42 @@ def cluster_paths(paths, threshold: float = DUPLICATE_THRESHOLD,
             i = parent[i]
         return i
 
-    pairs = (similarity >= threshold).nonzero()
-    for i, j in pairs.tolist():
+    for i, j in (similarity >= threshold).nonzero().tolist():
         if i < j:
             ri, rj = find(i), find(j)
             if ri != rj:
                 parent[ri] = rj
 
     groups = {}
-    for index, path in enumerate(paths):
-        groups.setdefault(find(index), []).append(path)
+    for index, key in enumerate(keys):
+        groups.setdefault(find(index), []).append(key)
     return list(groups.values())
+
+
+def cluster_paths(paths, threshold: float = DUPLICATE_THRESHOLD,
+                  device: torch.device | None = None):
+    """Group paths into near-duplicate clusters via connected components."""
+    paths = list(paths)
+    if not paths:
+        return []
+    return cluster_embeddings(paths, embed_paths(paths, device), threshold)
+
+
+def cross_label_conflicts(labels, embeddings, threshold: float = DUPLICATE_THRESHOLD):
+    """Indices of images that near-duplicate an image carrying a different label.
+
+    The same photograph filed under two breeds means at least one label is wrong,
+    and there is no way to tell which. Such images are dropped rather than
+    guessed at: keeping them would teach the model a contradiction and, if the
+    pair straddles a split, hand it a free correct answer at test time.
+    """
+    similarity = embeddings @ embeddings.T
+    conflicted = set()
+    for i, j in (similarity >= threshold).nonzero().tolist():
+        if i < j and labels[i] != labels[j]:
+            conflicted.add(i)
+            conflicted.add(j)
+    return conflicted
 
 
 def nearest_cross_split(query_paths, reference_paths, device: torch.device | None = None):
