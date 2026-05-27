@@ -28,9 +28,9 @@ class HistoryResponse(BaseModel): entries: list[HistoryEntry]; total: int
 
 BREED_CATALOG = {
     "Gir":{"type":AnimalType.CATTLE,"origin":"Gujarat","traits":['Hump', 'Pendulous ears', 'Reddish-brown coat'],"purpose":"Dairy","avg_milk_yield_liters":2100},
-    "Sahiwal":{"type":AnimalType.CATTLE,"origin":"Punjab","traits":['Reddish-dun coat', 'Heavy dewlap', 'Stumpy horns'],"purpose":"Dairy / Draught","avg_milk_yield_liters":2300},
+    "Rathi":{"type":AnimalType.CATTLE,"origin":"Rajasthan","traits":['Brown coat with white patches', 'Medium compact body', 'Curved horns'],"purpose":"Dairy","avg_milk_yield_liters":1560},
     "Red Sindhi":{"type":AnimalType.CATTLE,"origin":"Sindh","traits":['Deep red coat', 'Compact body', 'Short horns'],"purpose":"Dairy","avg_milk_yield_liters":1800},
-    "Tharparkar":{"type":AnimalType.CATTLE,"origin":"Rajasthan","traits":['White-grey coat', 'Lyra-shaped horns', 'Long face'],"purpose":"Dairy / Draught","avg_milk_yield_liters":1700},
+    "Khillari":{"type":AnimalType.CATTLE,"origin":"Maharashtra","traits":['Greyish-white coat', 'Long pointed horns', 'Tight muscular build'],"purpose":"Draught","avg_milk_yield_liters":500},
     "Kankrej":{"type":AnimalType.CATTLE,"origin":"Gujarat","traits":['Silver-grey coat', 'Large lyre horns', 'Pendulous ears'],"purpose":"Draught / Dairy","avg_milk_yield_liters":1300},
     "Ongole":{"type":AnimalType.CATTLE,"origin":"Andhra Pradesh","traits":['White coat', 'Short stumpy horns', 'Heavy body'],"purpose":"Draught / Dairy","avg_milk_yield_liters":1500},
     "Hariana":{"type":AnimalType.CATTLE,"origin":"Haryana","traits":['White-grey coat', 'Narrow face', 'Short horns'],"purpose":"Draught / Dairy","avg_milk_yield_liters":1000},
@@ -45,13 +45,19 @@ client=AsyncIOMotorClient(MONGO_URL); db=client[DB_NAME]
 
 @app.on_event("startup")
 async def startup():
-    if await db.breeds.count_documents({})==0:
-        await db.breeds.insert_many([{"name":k,**v} for k,v in BREED_CATALOG.items()])
+    # Reconcile every start, not just on an empty collection: the catalogue
+    # changes when the model's class list changes, and a seed-once check would
+    # leave a deployed database serving breeds the model can no longer predict.
+    for name, info in BREED_CATALOG.items():
+        await db.breeds.replace_one({"name": name}, {"name": name, **info}, upsert=True)
+    await db.breeds.delete_many({"name": {"$nin": list(BREED_CATALOG)}})
 
 @app.get("/api/breeds")
 async def get_breeds():
-    breeds=[]; async for doc in db.breeds.find({},projection={'_id':False}): breeds.append(doc)
-    return {'breeds':breeds}
+    breeds = []
+    async for doc in db.breeds.find({}, projection={'_id': False}):
+        breeds.append(doc)
+    return {'breeds': breeds}
 
 def _simulate_ai(catalog,top_n=4):
     names=list(catalog.keys()); top=random.choice(names); info=catalog[top]
@@ -72,13 +78,14 @@ async def recognize_breed(file:UploadFile=File(...)):
     if len(contents) > 5*1024*1024:
         raise HTTPException(400,detail="File exceeds maximum size of 5 MB")
     results=_simulate_ai(BREED_CATALOG); req_id=str(uuid.uuid4())[:8]
-    await db.history.insert_one({"request_id":req_id,"filename":file.filename or "unknown","top_breed":results[0].breed,"confidence":results[0].confidence,"results":[r.dict() for r in results],"timestamp":datetime.now(timezone.utc)})
+    await db.history.insert_one({"request_id":req_id,"filename":file.filename or "unknown","top_breed":results[0].breed,"confidence":results[0].confidence,"results":[r.model_dump() for r in results],"timestamp":datetime.now(timezone.utc)})
     return RecognizeResponse(results=results,top_match=results[0],request_id=req_id)
 
 @app.get("/api/history",response_model=HistoryResponse)
 async def get_history(limit:int=Query(20,ge=1,le=100),offset:int=Query(0,ge=0)):
     total=await db.history.count_documents({})
     cursor=db.history.find({}).sort("timestamp",-1).skip(offset).limit(limit)
-    entries=[]; async for doc in cursor:
+    entries = []
+    async for doc in cursor:
         entries.append(HistoryEntry(id=doc['request_id'],filename=doc['filename'],top_breed=doc['top_breed'],confidence=doc['confidence'],timestamp=doc['timestamp'],results=[RecognitionResult(**r) for r in doc['results']]))
     return HistoryResponse(entries=entries,total=total)
