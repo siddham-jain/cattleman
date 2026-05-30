@@ -1,0 +1,471 @@
+{
+  "checkpoint": "ml/models/strong-aug.pt",
+  "arch": "mobilenet_v3_large",
+  "split": "test",
+  "n": 198,
+  "top1": 0.6717171717171717,
+  "top3": 0.8939393939393939,
+  "macro_f1": 0.6334447273315442,
+  "per_class": [
+    {
+      "breed": "Gir",
+      "support": 6,
+      "precision": 0.6,
+      "recall": 0.5,
+      "f1": 0.5454545454545454
+    },
+    {
+      "breed": "Rathi",
+      "support": 22,
+      "precision": 0.8333333333333334,
+      "recall": 0.6818181818181818,
+      "f1": 0.7499999999999999
+    },
+    {
+      "breed": "Red Sindhi",
+      "support": 13,
+      "precision": 0.5,
+      "recall": 0.7692307692307693,
+      "f1": 0.6060606060606061
+    },
+    {
+      "breed": "Khillari",
+      "support": 17,
+      "precision": 0.7142857142857143,
+      "recall": 0.5882352941176471,
+      "f1": 0.6451612903225806
+    },
+    {
+      "breed": "Kankrej",
+      "support": 24,
+      "precision": 0.7619047619047619,
+      "recall": 0.6666666666666666,
+      "f1": 0.7111111111111111
+    },
+    {
+      "breed": "Ongole",
+      "support": 28,
+      "precision": 0.7419354838709677,
+      "recall": 0.8214285714285714,
+      "f1": 0.7796610169491526
+    },
+    {
+      "breed": "Hariana",
+      "support": 18,
+      "precision": 0.631578947368421,
+      "recall": 0.6666666666666666,
+      "f1": 0.6486486486486486
+    },
+    {
+      "breed": "Murrah",
+      "support": 24,
+      "precision": 0.6296296296296297,
+      "recall": 0.7083333333333334,
+      "f1": 0.6666666666666667
+    },
+    {
+      "breed": "Jaffarabadi",
+      "support": 15,
+      "precision": 0.7857142857142857,
+      "recall": 0.7333333333333333,
+      "f1": 0.7586206896551724
+    },
+    {
+      "breed": "Surti",
+      "support": 7,
+      "precision": 0.5,
+      "recall": 0.2857142857142857,
+      "f1": 0.36363636363636365
+    },
+    {
+      "breed": "Mehsana",
+      "support": 11,
+      "precision": 0.625,
+      "recall": 0.45454545454545453,
+      "f1": 0.5263157894736842
+    },
+    {
+      "breed": "Nili-Ravi",
+      "support": 13,
+      "precision": 0.5294117647058824,
+      "recall": 0.6923076923076923,
+      "f1": 0.5999999999999999
+    }
+  ],
+  "confusion": [
+    [
+      3,
+      0,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      15,
+      5,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      2,
+      1,
+      10,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      10,
+      1,
+      3,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      16,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      3,
+      0,
+      23,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      2,
+      3,
+      12,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      17,
+      2,
+      0,
+      0,
+      4
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      11,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      2,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5,
+      0,
+      0,
+      5,
+      1
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      9
+    ]
+  ],
+  "classes": [
+    "Gir",
+    "Rathi",
+    "Red Sindhi",
+    "Khillari",
+    "Kankrej",
+    "Ongole",
+    "Hariana",
+    "Murrah",
+    "Jaffarabadi",
+    "Surti",
+    "Mehsana",
+    "Nili-Ravi"
+  ],
+  "confusions": [
+    {
+      "true": "Rathi",
+      "predicted": "Red Sindhi",
+      "count": 5
+    },
+    {
+      "true": "Mehsana",
+      "predicted": "Murrah",
+      "count": 5
+    },
+    {
+      "true": "Murrah",
+      "predicted": "Nili-Ravi",
+      "count": 4
+    },
+    {
+      "true": "Khillari",
+      "predicted": "Ongole",
+      "count": 3
+    },
+    {
+      "true": "Khillari",
+      "predicted": "Hariana",
+      "count": 3
+    },
+    {
+      "true": "Ongole",
+      "predicted": "Khillari",
+      "count": 3
+    },
+    {
+      "true": "Hariana",
+      "predicted": "Ongole",
+      "count": 3
+    },
+    {
+      "true": "Gir",
+      "predicted": "Red Sindhi",
+      "count": 2
+    },
+    {
+      "true": "Red Sindhi",
+      "predicted": "Gir",
+      "count": 2
+    },
+    {
+      "true": "Kankrej",
+      "predicted": "Ongole",
+      "count": 2
+    },
+    {
+      "true": "Kankrej",
+      "predicted": "Hariana",
+      "count": 2
+    },
+    {
+      "true": "Hariana",
+      "predicted": "Kankrej",
+      "count": 2
+    },
+    {
+      "true": "Murrah",
+      "predicted": "Jaffarabadi",
+      "count": 2
+    },
+    {
+      "true": "Jaffarabadi",
+      "predicted": "Murrah",
+      "count": 2
+    },
+    {
+      "true": "Surti",
+      "predicted": "Murrah",
+      "count": 2
+    },
+    {
+      "true": "Gir",
+      "predicted": "Hariana",
+      "count": 1
+    },
+    {
+      "true": "Rathi",
+      "predicted": "Kankrej",
+      "count": 1
+    },
+    {
+      "true": "Rathi",
+      "predicted": "Nili-Ravi",
+      "count": 1
+    },
+    {
+      "true": "Red Sindhi",
+      "predicted": "Rathi",
+      "count": 1
+    },
+    {
+      "true": "Khillari",
+      "predicted": "Kankrej",
+      "count": 1
+    },
+    {
+      "true": "Kankrej",
+      "predicted": "Rathi",
+      "count": 1
+    },
+    {
+      "true": "Kankrej",
+      "predicted": "Red Sindhi",
+      "count": 1
+    },
+    {
+      "true": "Kankrej",
+      "predicted": "Khillari",
+      "count": 1
+    },
+    {
+      "true": "Kankrej",
+      "predicted": "Nili-Ravi",
+      "count": 1
+    },
+    {
+      "true": "Ongole",
+      "predicted": "Hariana",
+      "count": 1
+    },
+    {
+      "true": "Ongole",
+      "predicted": "Mehsana",
+      "count": 1
+    },
+    {
+      "true": "Hariana",
+      "predicted": "Rathi",
+      "count": 1
+    },
+    {
+      "true": "Murrah",
+      "predicted": "Red Sindhi",
+      "count": 1
+    },
+    {
+      "true": "Jaffarabadi",
+      "predicted": "Surti",
+      "count": 1
+    },
+    {
+      "true": "Jaffarabadi",
+      "predicted": "Mehsana",
+      "count": 1
+    },
+    {
+      "true": "Surti",
+      "predicted": "Kankrej",
+      "count": 1
+    },
+    {
+      "true": "Surti",
+      "predicted": "Mehsana",
+      "count": 1
+    },
+    {
+      "true": "Surti",
+      "predicted": "Nili-Ravi",
+      "count": 1
+    },
+    {
+      "true": "Mehsana",
+      "predicted": "Nili-Ravi",
+      "count": 1
+    },
+    {
+      "true": "Nili-Ravi",
+      "predicted": "Red Sindhi",
+      "count": 1
+    },
+    {
+      "true": "Nili-Ravi",
+      "predicted": "Murrah",
+      "count": 1
+    },
+    {
+      "true": "Nili-Ravi",
+      "predicted": "Jaffarabadi",
+      "count": 1
+    },
+    {
+      "true": "Nili-Ravi",
+      "predicted": "Surti",
+      "count": 1
+    }
+  ]
+}
