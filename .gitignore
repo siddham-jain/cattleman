@@ -19,3 +19,5 @@ ml/models/
 *.pt
 *.pth
 *.onnx
+mobile/node_modules/
+mobile/assets/model/*.onnx

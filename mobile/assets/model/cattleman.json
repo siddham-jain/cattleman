@@ -1,0 +1,50 @@
+{
+  "model": "cattleman.onnx",
+  "arch": "mobilenet_v3_large",
+  "img_size": 224,
+  "classes": [
+    "Gir",
+    "Rathi",
+    "Red Sindhi",
+    "Khillari",
+    "Kankrej",
+    "Ongole",
+    "Hariana",
+    "Murrah",
+    "Jaffarabadi",
+    "Surti",
+    "Mehsana",
+    "Nili-Ravi"
+  ],
+  "animal_type": {
+    "Gir": "cattle",
+    "Rathi": "cattle",
+    "Red Sindhi": "cattle",
+    "Khillari": "cattle",
+    "Kankrej": "cattle",
+    "Ongole": "cattle",
+    "Hariana": "cattle",
+    "Murrah": "buffalo",
+    "Jaffarabadi": "buffalo",
+    "Surti": "buffalo",
+    "Mehsana": "buffalo",
+    "Nili-Ravi": "buffalo"
+  },
+  "normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "layout": "NCHW",
+  "opset": 18,
+  "size_mb": 17.2,
+  "output": "logits (apply softmax for probabilities)",
+  "val_acc": 0.6515151515151515
+}
