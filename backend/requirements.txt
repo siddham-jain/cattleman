@@ -4,3 +4,6 @@ python-dotenv==1.1.0
 motor==3.3.2
 python-multipart==0.0.9
 pydantic==2.6.1
+onnxruntime==1.27.0
+pillow==12.3.0
+numpy==2.3.5
