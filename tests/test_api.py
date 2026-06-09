@@ -1,5 +1,18 @@
 """Test suite for Cattleman API endpoints."""
+import os
+from pathlib import Path
+
+import pytest
+
 from backend.server import BREED_CATALOG
+
+# The ONNX model is a build artefact, not a checked-in file, so recognition
+# tests skip rather than fail on a fresh clone. Everything else still runs.
+MODEL_PATH = Path(os.getenv("MODEL_PATH", "ml/models/cattleman.onnx"))
+requires_model = pytest.mark.skipif(
+    not MODEL_PATH.exists(),
+    reason=f"{MODEL_PATH} not built — run python ml/export_onnx.py",
+)
 
 
 class TestBreedsEndpoint:
@@ -22,6 +35,7 @@ class TestBreedsEndpoint:
             assert breed["traits"] and breed["origin"]
 
 
+@requires_model
 class TestRecognizeEndpoint:
     def test_no_file_returns_422(self, client):
         assert client.post("/api/recognize").status_code == 422
@@ -61,6 +75,7 @@ class TestHistoryEndpoint:
         assert "entries" in data
         assert "total" in data
 
+    @requires_model
     def test_recognition_is_recorded(self, client, sample_image_bytes):
         assert client.get("/api/history").json()["total"] == 0
         client.post("/api/recognize",
@@ -69,6 +84,7 @@ class TestHistoryEndpoint:
         assert history["total"] == 1
         assert history["entries"][0]["filename"] == "cow.jpg"
 
+    @requires_model
     def test_pagination_limits_results(self, client, sample_image_bytes):
         for _ in range(3):
             client.post("/api/recognize",
@@ -93,3 +109,54 @@ class TestErrorHandling:
         response = client.post("/api/recognize",
                                files={"file": ("big.jpg", b"x" * 6 * 1024 * 1024, "image/jpeg")})
         assert response.status_code == 400
+
+
+def _animal(animal_id="a1", breed="Gir", **overrides):
+    payload = {
+        "id": animal_id,
+        "breed": breed,
+        "animal_type": "cattle",
+        "confidence": 0.82,
+        "created_at": "2026-07-01T09:30:00Z",
+        "tag_id": "TAG-001",
+        "predictions": [{"breed": breed, "confidence": 0.82, "rank": 0}],
+        "corrections": [],
+    }
+    payload.update(overrides)
+    return payload
+
+
+class TestAnimalSync:
+    def test_upsert_stores_animal(self, client):
+        response = client.post("/api/animals", json=_animal())
+        assert response.status_code == 200
+        assert response.json()["id"] == "a1"
+        assert client.get("/api/animals").json()["total"] == 1
+
+    def test_upsert_is_idempotent(self, client):
+        """A retried create must not duplicate the animal."""
+        for _ in range(3):
+            assert client.post("/api/animals", json=_animal()).status_code == 200
+        assert client.get("/api/animals").json()["total"] == 1
+
+    def test_unknown_breed_is_rejected(self, client):
+        response = client.post("/api/animals", json=_animal(breed="Wildebeest"))
+        assert response.status_code == 422
+
+    def test_out_of_range_latitude_is_rejected(self, client):
+        response = client.post("/api/animals", json=_animal(latitude=120.0))
+        assert response.status_code == 422
+
+    def test_corrections_are_exposed_for_retraining(self, client):
+        client.post("/api/animals", json=_animal(
+            animal_id="a2", breed="Murrah", animal_type="buffalo",
+            corrections=[{"predicted_breed": "Surti", "corrected_breed": "Murrah"}],
+        ))
+        data = client.get("/api/corrections").json()
+        assert data["total"] == 1
+        assert data["corrections"][0]["predicted_breed"] == "Surti"
+        assert data["corrections"][0]["corrected_breed"] == "Murrah"
+
+    def test_animals_without_corrections_are_excluded(self, client):
+        client.post("/api/animals", json=_animal())
+        assert client.get("/api/corrections").json()["total"] == 0

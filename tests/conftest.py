@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from backend import server  # noqa: E402
 
 
+
 @pytest.fixture
 def client():
     """A TestClient backed by an in-memory database, with startup run.
