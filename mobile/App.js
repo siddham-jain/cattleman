@@ -1,0 +1,59 @@
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+
+import { restoreLocale, t } from './src/i18n';
+import { loadModel } from './src/inference/classifier';
+import { colors, typography } from './src/theme';
+
+import CaptureScreen from './src/screens/CaptureScreen';
+import ResultScreen from './src/screens/ResultScreen';
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      // Locale must resolve before first render. The model is warmed in
+      // parallel but never blocks startup — a failed load should surface when
+      // the user actually tries to identify something, with a real message.
+      await restoreLocale();
+      loadModel().catch(() => {});
+      setReady(true);
+    })();
+  }, []);
+
+  if (!ready) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: colors.surface },
+            headerTitleStyle: typography.heading,
+            headerTintColor: colors.primary,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="Capture" component={CaptureScreen}
+                        options={{ title: t('app.name') }} />
+          <Stack.Screen name="Result" component={ResultScreen}
+                        options={{ title: t('result.title') }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
+  );
+}

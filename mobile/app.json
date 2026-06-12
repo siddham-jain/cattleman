@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Cattleman",
+    "slug": "cattleman",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Cattleman uses the camera to photograph an animal for breed identification."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cattleman reads photos so you can identify an animal from an existing picture."
+        }
+      ]
+    ],
+    "android": {
+      "package": "in.cattleman.app",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
+    },
+    "ios": {
+      "bundleIdentifier": "in.cattleman.app",
+      "supportsTablet": false
+    },
+    "extra": {
+      "apiBaseUrl": "http://10.0.2.2:8000"
+    }
+  }
+}

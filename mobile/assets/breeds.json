@@ -1,0 +1,158 @@
+{
+  "Gir": {
+    "animalType": "cattle", "origin": "Gujarat", "purpose": "Dairy", "milkYieldLitres": 2100,
+    "names": { "en": "Gir", "hi": "गिर", "mr": "गीर" },
+    "traits": {
+      "en": ["Domed forehead", "Long pendulous ears", "Reddish-brown mottled coat"],
+      "hi": ["उभरा हुआ माथा", "लंबे लटकते कान", "लाल-भूरा चितकबरा रंग"],
+      "mr": ["उंचवटलेले कपाळ", "लांब लोंबते कान", "तांबूस-तपकिरी ठिपकेदार कातडी"]
+    },
+    "care": {
+      "en": "Tolerates heat well and suits open grazing. Give 25-30 kg green fodder daily with 2-3 kg concentrate for milking cows, and shade during peak summer.",
+      "hi": "गर्मी सहन कर लेती है और खुली चराई के लिए उपयुक्त है। दूध देने वाली गाय को रोज़ 25-30 किलो हरा चारा और 2-3 किलो दाना दें, तेज़ गर्मी में छाया रखें।"
+    }
+  },
+  "Rathi": {
+    "animalType": "cattle", "origin": "Rajasthan", "purpose": "Dairy", "milkYieldLitres": 1560,
+    "names": { "en": "Rathi", "hi": "राठी", "mr": "राठी" },
+    "traits": {
+      "en": ["Brown coat with white patches", "Medium compact body", "Short curved horns"],
+      "hi": ["सफेद धब्बों सहित भूरा रंग", "मध्यम गठीला शरीर", "छोटे मुड़े सींग"],
+      "mr": ["पांढऱ्या ठिपक्यांसह तपकिरी कातडी", "मध्यम बांधेसूद शरीर", "छोटी वळलेली शिंगे"]
+    },
+    "care": {
+      "en": "Bred for dry regions and needs little water. Dry fodder with 2 kg concentrate is adequate; add mineral mixture to counter the low calcium in desert grazing.",
+      "hi": "शुष्क क्षेत्रों की नस्ल, पानी कम लगता है। सूखा चारा और 2 किलो दाना पर्याप्त; रेगिस्तानी चराई में कैल्शियम की कमी के लिए मिनरल मिक्सचर दें।"
+    }
+  },
+  "Red Sindhi": {
+    "animalType": "cattle", "origin": "Sindh", "purpose": "Dairy", "milkYieldLitres": 1800,
+    "names": { "en": "Red Sindhi", "hi": "लाल सिंधी", "mr": "लाल सिंधी" },
+    "traits": {
+      "en": ["Deep red coat", "Compact rounded body", "Short thick horns"],
+      "hi": ["गहरा लाल रंग", "गठीला गोल शरीर", "छोटे मोटे सींग"],
+      "mr": ["गडद तांबडी कातडी", "बांधेसूद गोलसर शरीर", "छोटी जाड शिंगे"]
+    },
+    "care": {
+      "en": "Hardy and resistant to ticks. Keeps condition on ordinary fodder, but milk yield drops sharply if water is restricted in summer.",
+      "hi": "मजबूत नस्ल, चिचड़ी का असर कम। साधारण चारे पर भी ठीक रहती है, पर गर्मी में पानी कम मिले तो दूध तेज़ी से घटता है।"
+    }
+  },
+  "Khillari": {
+    "animalType": "cattle", "origin": "Maharashtra", "purpose": "Draught", "milkYieldLitres": 500,
+    "names": { "en": "Khillari", "hi": "खिल्लारी", "mr": "खिलारी" },
+    "traits": {
+      "en": ["Greyish-white coat", "Very long pointed horns", "Tight muscular build"],
+      "hi": ["धूसर-सफेद रंग", "बहुत लंबे नुकीले सींग", "कसा हुआ मांसल शरीर"],
+      "mr": ["करडी-पांढरी कातडी", "खूप लांब टोकदार शिंगे", "घट्ट स्नायूंचे शरीर"]
+    },
+    "care": {
+      "en": "A working bullock breed, not a milk breed. Needs energy-dense feed on ploughing days and rest between heavy work; do not judge it on milk yield.",
+      "hi": "यह बैल की काम वाली नस्ल है, दूध की नहीं। जुताई के दिनों में ऊर्जा वाला आहार और भारी काम के बीच आराम दें; दूध से इसका मूल्यांकन न करें।"
+    }
+  },
+  "Kankrej": {
+    "animalType": "cattle", "origin": "Gujarat", "purpose": "Draught / Dairy", "milkYieldLitres": 1300,
+    "names": { "en": "Kankrej", "hi": "कांकरेज", "mr": "कांकरेज" },
+    "traits": {
+      "en": ["Silver-grey coat", "Large lyre-shaped horns", "Distinctive swinging gait"],
+      "hi": ["चांदी जैसा धूसर रंग", "बड़े वीणाकार सींग", "विशेष झूलती चाल"],
+      "mr": ["चंदेरी-करडी कातडी", "मोठी वीणाकृती शिंगे", "वैशिष्ट्यपूर्ण झुलती चाल"]
+    },
+    "care": {
+      "en": "Dual purpose and drought-tolerant. Handles long walks to grazing; provide 3 kg concentrate when both milking and working.",
+      "hi": "दोहरे उपयोग की, सूखा सहने वाली। चराई के लिए लंबी दूरी चल लेती है; दूध और काम दोनों के समय 3 किलो दाना दें।"
+    }
+  },
+  "Ongole": {
+    "animalType": "cattle", "origin": "Andhra Pradesh", "purpose": "Draught / Dairy", "milkYieldLitres": 1500,
+    "names": { "en": "Ongole", "hi": "ओंगोल", "mr": "ओंगोल" },
+    "traits": {
+      "en": ["White to grey coat", "Very heavy muscular body", "Short stumpy horns"],
+      "hi": ["सफेद से धूसर रंग", "बहुत भारी मांसल शरीर", "छोटे ठूंठदार सींग"],
+      "mr": ["पांढरी ते करडी कातडी", "अतिशय जड स्नायूंचे शरीर", "छोटी बुटकी शिंगे"]
+    },
+    "care": {
+      "en": "Large frame needs generous roughage — 35 kg green fodder daily for adults. Prone to foot problems on wet, muddy flooring, so keep sheds well drained.",
+      "hi": "बड़े शरीर को अधिक चारा चाहिए — वयस्क को रोज़ 35 किलो हरा चारा। गीले कीचड़ भरे फर्श पर खुर की समस्या होती है, इसलिए शेड सूखा रखें।"
+    }
+  },
+  "Hariana": {
+    "animalType": "cattle", "origin": "Haryana", "purpose": "Draught / Dairy", "milkYieldLitres": 1000,
+    "names": { "en": "Hariana", "hi": "हरियाणा", "mr": "हरियाणा" },
+    "traits": {
+      "en": ["White or light grey coat", "Narrow long face", "Short horns set close"],
+      "hi": ["सफेद या हल्का धूसर रंग", "पतला लंबा चेहरा", "पास-पास छोटे सींग"],
+      "mr": ["पांढरी किंवा फिकट करडी कातडी", "अरुंद लांब चेहरा", "जवळजवळ असलेली छोटी शिंगे"]
+    },
+    "care": {
+      "en": "Well suited to mixed crop farming and thrives on wheat straw with green supplement. Deworm before the monsoon when grazing on wet fields.",
+      "hi": "मिश्रित खेती के लिए उपयुक्त, गेहूं के भूसे और हरे चारे पर अच्छी रहती है। बरसात से पहले कृमिनाशक दवा दें।"
+    }
+  },
+  "Murrah": {
+    "animalType": "buffalo", "origin": "Haryana", "purpose": "Dairy", "milkYieldLitres": 2500,
+    "names": { "en": "Murrah", "hi": "मुर्रा", "mr": "मुऱ्हा" },
+    "traits": {
+      "en": ["Jet black coat", "Tightly curled short horns", "Massive heavy body"],
+      "hi": ["गहरा काला रंग", "कसकर मुड़े छोटे सींग", "भारी विशाल शरीर"],
+      "mr": ["काळीभोर कातडी", "घट्ट वळलेली छोटी शिंगे", "प्रचंड जड शरीर"]
+    },
+    "care": {
+      "en": "The highest-yielding Indian buffalo and the most feed-demanding: 30-35 kg green fodder plus 4-5 kg concentrate when in milk. Wallowing or a water spray in summer is essential — heat stress cuts yield fast.",
+      "hi": "सबसे अधिक दूध देने वाली भारतीय भैंस, आहार भी अधिक चाहिए: दूध के समय 30-35 किलो हरा चारा और 4-5 किलो दाना। गर्मी में तालाब या पानी का छिड़काव ज़रूरी, वरना दूध तेज़ी से घटता है।"
+    }
+  },
+  "Jaffarabadi": {
+    "animalType": "buffalo", "origin": "Gujarat", "purpose": "Dairy", "milkYieldLitres": 2200,
+    "names": { "en": "Jaffarabadi", "hi": "जाफराबादी", "mr": "जाफराबादी" },
+    "traits": {
+      "en": ["Very heavy drooping horns", "Broad prominent forehead", "Black coat, largest Indian buffalo"],
+      "hi": ["बहुत भारी झुके सींग", "चौड़ा उभरा माथा", "काला रंग, सबसे बड़ी भारतीय भैंस"],
+      "mr": ["खूप जड झुकलेली शिंगे", "रुंद ठळक कपाळ", "काळी कातडी, सर्वात मोठी भारतीय म्हैस"]
+    },
+    "care": {
+      "en": "Its size makes handling and transport demanding; use wide gates and strong crushes. Feed generously — underfeeding shows first as poor body condition rather than lower milk.",
+      "hi": "आकार बड़ा होने से संभालना और ले जाना कठिन; चौड़े गेट और मजबूत बाड़ा रखें। भरपूर आहार दें — कम खिलाने पर पहले शरीर कमजोर दिखता है, फिर दूध घटता है।"
+    }
+  },
+  "Surti": {
+    "animalType": "buffalo", "origin": "Gujarat", "purpose": "Dairy", "milkYieldLitres": 1800,
+    "names": { "en": "Surti", "hi": "सुरती", "mr": "सुरती" },
+    "traits": {
+      "en": ["Medium black or brown body", "Sickle-shaped horns", "Two white collar markings"],
+      "hi": ["मध्यम काला या भूरा शरीर", "हंसिया आकार के सींग", "गले पर दो सफेद पट्टियां"],
+      "mr": ["मध्यम काळे किंवा तपकिरी शरीर", "विळ्याच्या आकाराची शिंगे", "गळ्यावर दोन पांढरे पट्टे"]
+    },
+    "care": {
+      "en": "Smaller frame and lower maintenance cost, a good fit for one- or two-animal households. Milk has high fat, so steady feeding matters more than volume of fodder.",
+      "hi": "छोटा शरीर और कम खर्च, एक-दो पशु वाले घरों के लिए उपयुक्त। दूध में वसा अधिक होती है, इसलिए चारे की मात्रा से ज़्यादा नियमितता ज़रूरी है।"
+    }
+  },
+  "Mehsana": {
+    "animalType": "buffalo", "origin": "Gujarat", "purpose": "Dairy", "milkYieldLitres": 2000,
+    "names": { "en": "Mehsana", "hi": "मेहसाणा", "mr": "मेहसाणा" },
+    "traits": {
+      "en": ["Black coat, sometimes brownish", "Medium sickle horns", "Longer body than Murrah"],
+      "hi": ["काला रंग, कभी भूरापन", "मध्यम हंसिया सींग", "मुर्रा से लंबा शरीर"],
+      "mr": ["काळी कातडी, कधी तपकिरी छटा", "मध्यम विळ्यासारखी शिंगे", "मुऱ्ह्यापेक्षा लांब शरीर"]
+    },
+    "care": {
+      "en": "A Murrah-Surti cross type with steadier lactation than either. Regular milking intervals matter; irregular milking is the usual cause of yield loss in this breed.",
+      "hi": "मुर्रा और सुरती के मेल की नस्ल, दूध अधिक स्थिर रहता है। दूध निकालने का समय नियमित रखें; अनियमितता ही दूध घटने का मुख्य कारण है।"
+    }
+  },
+  "Nili-Ravi": {
+    "animalType": "buffalo", "origin": "Punjab", "purpose": "Dairy", "milkYieldLitres": 2400,
+    "names": { "en": "Nili-Ravi", "hi": "नीली-रावी", "mr": "निली-रावी" },
+    "traits": {
+      "en": ["Black coat with white forehead and tail switch", "Wall eyes (blue-white iris)", "Deep long body"],
+      "hi": ["काला रंग, माथा और पूंछ सफेद", "नीली-सफेद आंखें", "गहरा लंबा शरीर"],
+      "mr": ["काळी कातडी, कपाळ व शेपटी पांढरी", "निळसर-पांढरे डोळे", "खोल लांब शरीर"]
+    },
+    "care": {
+      "en": "The wall eye is normal for the breed, not a defect or disease. Needs plenty of water and green fodder; yield is close to Murrah under equally good feeding.",
+      "hi": "नीली-सफेद आंखें इस नस्ल की पहचान हैं, कोई रोग नहीं। भरपूर पानी और हरा चारा चाहिए; अच्छे आहार पर दूध मुर्रा के लगभग बराबर होता है।"
+    }
+  }
+}

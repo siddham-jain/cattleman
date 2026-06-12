@@ -1,0 +1,78 @@
+{
+  "app": { "name": "Cattleman", "tagline": "Identify Indian cattle and buffalo breeds" },
+  "nav": {
+    "capture": "Identify",
+    "registry": "Registry",
+    "guide": "Breed guide",
+    "settings": "Settings"
+  },
+  "capture": {
+    "title": "Identify a breed",
+    "instructions": "Photograph the animal from the side, with the whole body in frame.",
+    "takePhoto": "Take photo",
+    "choosePhoto": "Choose from gallery",
+    "analysing": "Identifying breed…",
+    "permissionNeeded": "Camera access is needed to photograph the animal.",
+    "grantPermission": "Allow camera"
+  },
+  "result": {
+    "title": "Result",
+    "topMatch": "Most likely breed",
+    "otherMatches": "Other possibilities",
+    "confidence": "{{percent}}% confident",
+    "lowConfidence": "The model is unsure. Check the alternatives before saving.",
+    "notListed": "None of these — choose manually",
+    "register": "Register this animal",
+    "retake": "Retake photo",
+    "correctionNote": "You changed the breed. This correction is saved to improve the model."
+  },
+  "register": {
+    "title": "Register animal",
+    "tagId": "Tag number",
+    "tagIdHint": "Ear tag or local identifier",
+    "ownerName": "Owner name",
+    "notes": "Notes",
+    "location": "Location",
+    "locationCaptured": "Location captured",
+    "locationUnavailable": "Location unavailable",
+    "save": "Save registration",
+    "saved": "Registered. It will sync when you are online.",
+    "breed": "Breed"
+  },
+  "registry": {
+    "title": "Registered animals",
+    "empty": "No animals registered yet.",
+    "pending": "{{count}} waiting to sync",
+    "allSynced": "All records synced",
+    "syncNow": "Sync now",
+    "syncing": "Syncing…",
+    "syncFailed": "Sync failed. It will retry automatically.",
+    "distribution": "Breeds registered"
+  },
+  "guide": {
+    "title": "Breed guide",
+    "search": "Search breeds",
+    "origin": "Origin",
+    "purpose": "Purpose",
+    "milkYield": "Milk yield",
+    "milkYieldValue": "{{litres}} litres per lactation",
+    "traits": "Identifying features",
+    "care": "Care and feeding",
+    "cattle": "Cattle",
+    "buffalo": "Buffalo"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "serverUrl": "Server address",
+    "about": "About",
+    "modelVersion": "Model version",
+    "pendingRecords": "Records awaiting sync"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "close": "Close",
+    "error": "Something went wrong"
+  }
+}
