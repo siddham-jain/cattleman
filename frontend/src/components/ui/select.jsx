@@ -1,7 +1,0 @@
-import * as React from 'react'; import { cn } from '@/lib/utils';
-const Select = ({ children, onValueChange, defaultValue }) => { const [open, setOpen] = React.useState(false); const [value, setValue] = React.useState(defaultValue||''); return <div className='relative'>{React.Children.map(children, child => React.cloneElement(child, {open,setOpen,value,setValue,onValueChange}))}</div>; };
-const SelectTrigger = ({ children, open, setOpen }) => (<button type='button' className='flex h-10 w-full items-center justify-between rounded-md border border-stone-200 bg-white px-3 py-2 text-sm' onClick={()=>setOpen(!open)}>{children}<span className='ml-2'>{open?'▲':'▼'}</span></button>);
-const SelectValue = ({ placeholder, value }) => <span className={value?'':'text-stone-400'}>{value||placeholder}</span>;
-const SelectContent = ({ children, open, setOpen, value, setValue, onValueChange }) => { if(!open) return null; return (<div className='absolute z-50 mt-1 w-full rounded-md border bg-white py-1 shadow-lg'>{React.Children.map(children, child => React.cloneElement(child, {setOpen,value,setValue,onValueChange}))}</div>); };
-const SelectItem = ({ value: iv, children, setOpen, value, setValue, onValueChange }) => (<div className={cn('cursor-pointer px-3 py-1.5 text-sm hover:bg-amber-50', value===iv&&'bg-amber-100 font-medium')} onClick={()=>{setValue(iv);onValueChange?.(iv);setOpen(false)}}>{children}</div>);
-export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem };
