@@ -1,108 +1,94 @@
 {
   "root": "ml/data/splits",
-  "images": 598,
+  "images": 1317,
   "unreadable": 0,
-  "per_breed": {
-    "Gir": 52,
-    "Hariana": 52,
-    "Jaffarabadi": 52,
-    "Kankrej": 52,
-    "Mehsana": 26,
-    "Murrah": 52,
-    "Nili-Ravi": 52,
-    "Ongole": 52,
-    "Red Sindhi": 52,
-    "Sahiwal": 52,
-    "Surti": 52,
-    "Tharparkar": 52
-  },
-  "distinct_sources": 465,
+  "threshold": 0.95,
+  "distinct_photographs": 1273,
   "cross_split_groups": 0,
-  "images_in_leaking_groups": 0,
-  "per_breed_detail": [
+  "per_breed": [
     {
       "breed": "Gir",
-      "images": 52,
-      "sources": 42,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 38,
+      "sources": 37,
+      "images_per_source": 1.03,
+      "cross_split_groups": 0
     },
     {
       "breed": "Hariana",
-      "images": 52,
-      "sources": 35,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 122,
+      "sources": 121,
+      "images_per_source": 1.01,
+      "cross_split_groups": 0
     },
     {
       "breed": "Jaffarabadi",
-      "images": 52,
-      "sources": 45,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 100,
+      "sources": 93,
+      "images_per_source": 1.08,
+      "cross_split_groups": 0
     },
     {
       "breed": "Kankrej",
-      "images": 52,
-      "sources": 42,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 159,
+      "sources": 156,
+      "images_per_source": 1.02,
+      "cross_split_groups": 0
+    },
+    {
+      "breed": "Khillari",
+      "images": 111,
+      "sources": 106,
+      "images_per_source": 1.05,
+      "cross_split_groups": 0
     },
     {
       "breed": "Mehsana",
-      "images": 26,
-      "sources": 17,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 74,
+      "sources": 71,
+      "images_per_source": 1.04,
+      "cross_split_groups": 0
     },
     {
       "breed": "Murrah",
-      "images": 52,
-      "sources": 36,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 158,
+      "sources": 150,
+      "images_per_source": 1.05,
+      "cross_split_groups": 0
     },
     {
       "breed": "Nili-Ravi",
-      "images": 52,
-      "sources": 43,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 87,
+      "sources": 84,
+      "images_per_source": 1.04,
+      "cross_split_groups": 0
     },
     {
       "breed": "Ongole",
-      "images": 52,
-      "sources": 40,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 186,
+      "sources": 181,
+      "images_per_source": 1.03,
+      "cross_split_groups": 0
+    },
+    {
+      "breed": "Rathi",
+      "images": 145,
+      "sources": 144,
+      "images_per_source": 1.01,
+      "cross_split_groups": 0
     },
     {
       "breed": "Red Sindhi",
-      "images": 52,
-      "sources": 46,
-      "cross_split_groups": 0,
-      "affected_images": 0
-    },
-    {
-      "breed": "Sahiwal",
-      "images": 52,
-      "sources": 37,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images": 89,
+      "sources": 87,
+      "images_per_source": 1.02,
+      "cross_split_groups": 0
     },
     {
       "breed": "Surti",
-      "images": 52,
-      "sources": 39,
-      "cross_split_groups": 0,
-      "affected_images": 0
-    },
-    {
-      "breed": "Tharparkar",
-      "images": 52,
+      "images": 48,
       "sources": 43,
-      "cross_split_groups": 0,
-      "affected_images": 0
+      "images_per_source": 1.12,
+      "cross_split_groups": 0
     }
   ]
 }
