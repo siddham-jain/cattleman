@@ -6,11 +6,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import { restoreLocale, t } from './src/i18n';
+import { getDatabase } from './src/db/database';
 import { loadModel } from './src/inference/classifier';
 import { colors, typography } from './src/theme';
 
 import CaptureScreen from './src/screens/CaptureScreen';
 import ResultScreen from './src/screens/ResultScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
+import RegistryScreen from './src/screens/RegistryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,10 +22,11 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      // Locale must resolve before first render. The model is warmed in
-      // parallel but never blocks startup — a failed load should surface when
-      // the user actually tries to identify something, with a real message.
-      await restoreLocale();
+      // Locale and database must be ready before first render. The model is
+      // warmed in parallel but never blocks startup — a failed load should
+      // surface when the user tries to identify something, and must not stop
+      // them reaching records they have already saved.
+      await Promise.all([restoreLocale(), getDatabase()]);
       loadModel().catch(() => {});
       setReady(true);
     })();
@@ -52,6 +56,10 @@ export default function App() {
                         options={{ title: t('app.name') }} />
           <Stack.Screen name="Result" component={ResultScreen}
                         options={{ title: t('result.title') }} />
+          <Stack.Screen name="Register" component={RegisterScreen}
+                        options={{ title: t('register.title') }} />
+          <Stack.Screen name="Registry" component={RegistryScreen}
+                        options={{ title: t('registry.title') }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
