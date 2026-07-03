@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import { restoreLocale, t } from './src/i18n';
 import { getDatabase } from './src/db/database';
 import { loadModel } from './src/inference/classifier';
+import { startSyncLoop } from './src/sync/sync';
 import { colors, typography } from './src/theme';
 
 import CaptureScreen from './src/screens/CaptureScreen';
@@ -21,6 +22,7 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let stopSync;
     (async () => {
       // Locale and database must be ready before first render. The model is
       // warmed in parallel but never blocks startup — a failed load should
@@ -28,8 +30,10 @@ export default function App() {
       // them reaching records they have already saved.
       await Promise.all([restoreLocale(), getDatabase()]);
       loadModel().catch(() => {});
+      stopSync = startSyncLoop();
       setReady(true);
     })();
+    return () => stopSync?.();
   }, []);
 
   if (!ready) {
