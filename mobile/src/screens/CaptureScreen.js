@@ -75,6 +75,12 @@ export default function CaptureScreen({ navigation }) {
         <Pressable style={styles.link} onPress={() => navigation.navigate('Registry')}>
           <Text style={styles.linkText}>{t('nav.registry')}</Text>
         </Pressable>
+        <Pressable style={styles.link} onPress={() => navigation.navigate('BreedGuide')}>
+          <Text style={styles.linkText}>{t('nav.guide')}</Text>
+        </Pressable>
+        <Pressable style={styles.link} onPress={() => navigation.navigate('Settings')}>
+          <Text style={styles.linkText}>{t('nav.settings')}</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -102,7 +108,7 @@ const styles = StyleSheet.create({
   primaryButton: { backgroundColor: colors.primary, borderColor: colors.primary },
   buttonText: { ...typography.body, fontWeight: '600' },
   primaryButtonText: { color: colors.primaryText, fontSize: 16, fontWeight: '700' },
-  links: { flexDirection: 'row', marginTop: spacing.lg },
+  links: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.lg },
   link: { minHeight: TOUCH_TARGET, justifyContent: 'center', paddingHorizontal: spacing.sm },
   linkText: { color: colors.primary, fontSize: 15, fontWeight: '600' },
 });

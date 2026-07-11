@@ -15,6 +15,8 @@ import CaptureScreen from './src/screens/CaptureScreen';
 import ResultScreen from './src/screens/ResultScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import RegistryScreen from './src/screens/RegistryScreen';
+import BreedGuideScreen from './src/screens/BreedGuideScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -64,6 +66,10 @@ export default function App() {
                         options={{ title: t('register.title') }} />
           <Stack.Screen name="Registry" component={RegistryScreen}
                         options={{ title: t('registry.title') }} />
+          <Stack.Screen name="BreedGuide" component={BreedGuideScreen}
+                        options={{ title: t('guide.title') }} />
+          <Stack.Screen name="Settings" component={SettingsScreen}
+                        options={{ title: t('settings.title') }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
