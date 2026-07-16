@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timezone
 from typing import Optional
 from io import BytesIO
+from contextlib import asynccontextmanager
 from PIL import Image
 import os, uuid
 
@@ -14,8 +15,23 @@ from backend.inference import ModelUnavailable, get_classifier
 
 load_dotenv()
 
-app = FastAPI(title="Cattleman API", version="0.3.0",
-    description="Indian cattle & buffalo breed recognition API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Reconcile the breed collection every start, not just when it is empty: the
+    # catalogue changes when the model's class list changes, and a seed-once
+    # check would leave a deployed database serving breeds the model can no
+    # longer predict. Reads BREED_CATALOG and db, both defined below — resolved
+    # at call time, not import time.
+    for name, info in BREED_CATALOG.items():
+        await db.breeds.replace_one({"name": name}, {"name": name, **info}, upsert=True)
+    await db.breeds.delete_many({"name": {"$nin": list(BREED_CATALOG)}})
+    yield
+
+
+app = FastAPI(title="Cattleman API", version="0.4.0",
+    description="Indian cattle & buffalo breed recognition API",
+    lifespan=lifespan)
 
 # Production-ready CORS
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
@@ -74,15 +90,6 @@ BREED_CATALOG = {
 }
 MONGO_URL=os.getenv('MONGO_URL','mongodb://localhost:27017'); DB_NAME=os.getenv('DB_NAME','cattleman')
 client=AsyncIOMotorClient(MONGO_URL); db=client[DB_NAME]
-
-@app.on_event("startup")
-async def startup():
-    # Reconcile every start, not just on an empty collection: the catalogue
-    # changes when the model's class list changes, and a seed-once check would
-    # leave a deployed database serving breeds the model can no longer predict.
-    for name, info in BREED_CATALOG.items():
-        await db.breeds.replace_one({"name": name}, {"name": name, **info}, upsert=True)
-    await db.breeds.delete_many({"name": {"$nin": list(BREED_CATALOG)}})
 
 @app.get("/api/breeds")
 async def get_breeds():
