@@ -11,7 +11,7 @@ test_reports/
 build/
 dist/
 
-# ML workspace
+# ML workspace — training scratch space, not artefacts anyone else needs
 .venv/
 ml/data/
 ml/runs/
@@ -20,4 +20,8 @@ ml/models/
 *.pth
 *.onnx
 mobile/node_modules/
-mobile/assets/model/*.onnx
+
+# The shipped model is the exception. It is committed so a clone builds and runs
+# without first downloading 1,390 images and retraining; 17 MB is a fair price
+# for the app working out of the box. Rebuild it with ml/export_onnx.py.
+!mobile/assets/model/cattleman.onnx

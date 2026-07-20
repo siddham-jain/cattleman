@@ -60,7 +60,15 @@ python3 -m venv .venv
 .venv/bin/pytest tests/
 ```
 
-**Model** - the ONNX artefact is a build output, not in version control:
+**Model** - the trained model ships with the repo at
+`mobile/assets/model/cattleman.onnx` (17.2 MB), so the app and the API work on a
+fresh clone. Point the backend at it with `MODEL_PATH`:
+
+```bash
+export MODEL_PATH=mobile/assets/model/cattleman.onnx
+```
+
+To rebuild it from scratch instead:
 
 ```bash
 .venv/bin/pip install -r ml/requirements.txt
