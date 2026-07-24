@@ -1,28 +1,39 @@
 /**
  * On-device breed classification with ONNX Runtime.
  *
- * Preprocessing here must match ml/data.py's eval transform exactly — resize the
- * short side, centre crop, scale to [0,1], then normalise with ImageNet
- * statistics. A mismatch does not throw; it quietly shifts every prediction, so
- * the constants come from the model's metadata JSON rather than being retyped.
+ * The preprocessing constants come from the model's metadata JSON rather than
+ * being retyped, and the maths itself lives in preprocess.js so this and the web
+ * classifier cannot drift apart.
  */
 import { InferenceSession, Tensor } from 'onnxruntime-react-native';
 import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 
 import modelMetadata from '../../assets/model/cattleman.json';
+import { rankBreeds, RESIZE_RATIO, toPlanarFloat32 } from './preprocess';
+import { setModelStatus } from './status';
 
 let sessionPromise = null;
 
-/** Load once and reuse — session creation costs hundreds of milliseconds. */
+/**
+ * Load once and reuse — session creation costs hundreds of milliseconds.
+ *
+ * There is no download phase here: the graph ships inside the app bundle, which
+ * is the point of the whole offline-first design. It still reports its progress
+ * so the capture screen can say the same things on a phone as in a browser.
+ */
 export function loadModel() {
   if (!sessionPromise) {
     sessionPromise = (async () => {
+      setModelStatus({ phase: 'preparing', progress: 1, error: null });
       const asset = `${FileSystem.bundleDirectory ?? ''}assets/model/cattleman.onnx`;
-      return InferenceSession.create(asset);
+      const session = await InferenceSession.create(asset);
+      setModelStatus({ phase: 'ready', progress: 1 });
+      return session;
     })().catch((error) => {
       // Reset so a later attempt can retry rather than resolving a dead promise.
       sessionPromise = null;
+      setModelStatus({ phase: 'error', error: error?.message ?? String(error) });
       throw error;
     });
   }
@@ -40,7 +51,7 @@ async function resizeAndCrop(uri, size) {
     base64: false,
     format: ImageManipulator.SaveFormat.JPEG,
   });
-  const scale = (size * 1.14) / Math.min(probe.width, probe.height);
+  const scale = (size * RESIZE_RATIO) / Math.min(probe.width, probe.height);
   const resized = await ImageManipulator.manipulateAsync(
     uri,
     [{ resize: { width: Math.round(probe.width * scale), height: Math.round(probe.height * scale) } }],
@@ -55,56 +66,15 @@ async function resizeAndCrop(uri, size) {
   );
 }
 
-function softmax(logits) {
-  const max = Math.max(...logits);
-  const exps = logits.map((value) => Math.exp(value - max));
-  const sum = exps.reduce((a, b) => a + b, 0);
-  return exps.map((value) => value / sum);
-}
-
-/**
- * Build the NCHW float tensor the model expects.
- *
- * `pixels` is RGBA bytes; the alpha channel is dropped and channels are
- * separated, because ONNX wants planar CHW rather than interleaved.
- */
-export function buildInputTensor(pixels, size, normalization) {
-  const { mean, std } = normalization;
-  const data = new Float32Array(3 * size * size);
-  const plane = size * size;
-  for (let i = 0; i < plane; i += 1) {
-    for (let c = 0; c < 3; c += 1) {
-      const value = pixels[i * 4 + c] / 255;
-      data[c * plane + i] = (value - mean[c]) / std[c];
-    }
-  }
-  return new Tensor('float32', data, [1, 3, size, size]);
-}
-
-/**
- * Classify an image and return every breed ranked by probability.
- *
- * Returns the full ranking rather than one answer: with the accuracy this model
- * achieves, a field worker is better served choosing from a shortlist than being
- * told a single breed with false authority.
- */
+/** Classify an image and return every breed ranked by probability. */
 export async function classify(uri, decodePixels) {
   const session = await loadModel();
-  const { img_size: size, classes, normalization, animal_type: animalTypes } = modelMetadata;
+  const { img_size: size, normalization } = modelMetadata;
 
   const processed = await resizeAndCrop(uri, size);
   const pixels = await decodePixels(processed);
-  const tensor = buildInputTensor(pixels, size, normalization);
+  const data = toPlanarFloat32(pixels, size, normalization);
 
-  const outputs = await session.run({ input: tensor });
-  const logits = Array.from(outputs.logits.data);
-  const probabilities = softmax(logits);
-
-  return classes
-    .map((breed, index) => ({
-      breed,
-      confidence: probabilities[index],
-      animalType: animalTypes[breed],
-    }))
-    .sort((a, b) => b.confidence - a.confidence);
+  const outputs = await session.run({ input: new Tensor('float32', data, [1, 3, size, size]) });
+  return rankBreeds(Array.from(outputs.logits.data), modelMetadata);
 }
