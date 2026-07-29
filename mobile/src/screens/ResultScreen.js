@@ -2,19 +2,24 @@ import { useState } from 'react';
 import {
   Image, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { i18n, t } from '../i18n';
-import breedInfo from '../../assets/breeds.json';
+import { t } from '../i18n';
+import { breedImage, breedName } from '../breeds';
+import Button from '../components/Button';
+import Pill from '../components/Pill';
 import {
-  colors, confidenceColor, LOW_CONFIDENCE, radius, spacing, TOUCH_TARGET, typography,
+  animalTypeColor, colors, confidenceColor, LOW_CONFIDENCE, radius, shadow,
+  spacing, typography,
 } from '../theme';
 
 /**
  * Shows the ranked candidates rather than a single verdict.
  *
  * The model is right about two times in three, so presenting one breed as "the"
- * answer would overstate what it knows. A worker who can see the runners-up and
- * override them ends up with better data than one who is handed a guess.
+ * answer would overstate what it knows. A worker who can see the runners-up,
+ * compare them against the reference photos, and override them ends up with
+ * better data than one who is handed a guess.
  */
 export default function ResultScreen({ route, navigation }) {
   const { photoUri, ranked } = route.params;
@@ -23,13 +28,9 @@ export default function ResultScreen({ route, navigation }) {
   const top = ranked[0];
   const uncertain = top.confidence < LOW_CONFIDENCE;
   const corrected = chosen !== top.breed;
-
-  // Breed names are proper nouns, so they live in breeds.json beside the rest of
-  // the reference data rather than in the UI string catalogues.
-  function localName(breed) {
-    const names = breedInfo[breed]?.names;
-    return names?.[i18n.locale] ?? names?.en ?? breed;
-  }
+  // A long tail of near-zero candidates is noise; the rest is available on tap.
+  const [showAll, setShowAll] = useState(false);
+  const candidates = showAll ? ranked : ranked.slice(0, 4);
 
   function proceed() {
     const selected = ranked.find((r) => r.breed === chosen) ?? ranked[0];
@@ -44,89 +45,139 @@ export default function ResultScreen({ route, navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: photoUri }} style={styles.photo} resizeMode="cover" />
-
-      <Text style={typography.small}>{t('result.topMatch')}</Text>
-      <Text style={styles.topBreed}>{localName(top.breed)}</Text>
-      <Text style={[styles.confidence, { color: confidenceColor(top.confidence) }]}>
-        {t('result.confidence', { percent: Math.round(top.confidence * 100) })}
-      </Text>
+      <View style={styles.hero}>
+        <Image source={{ uri: photoUri }} style={styles.photo} resizeMode="cover" />
+        <View style={styles.heroBody}>
+          <Text style={typography.label}>{t('result.topMatch')}</Text>
+          <Text style={styles.topBreed}>{breedName(top.breed)}</Text>
+          <View style={styles.heroPills}>
+            <Pill
+              label={t(`guide.${top.animalType}`)}
+              color={animalTypeColor(top.animalType)}
+            />
+            <Pill
+              label={t('result.confidence', { percent: Math.round(top.confidence * 100) })}
+              color={confidenceColor(top.confidence)}
+              filled
+            />
+          </View>
+        </View>
+      </View>
 
       {uncertain && (
         <View style={styles.warning}>
+          <Ionicons name="alert-circle" size={20} color={colors.warning} />
           <Text style={styles.warningText}>{t('result.lowConfidence')}</Text>
         </View>
       )}
 
-      <Text style={[typography.heading, styles.sectionHeading]}>{t('result.otherMatches')}</Text>
-      {ranked.map((candidate) => {
+      <Text style={[typography.label, styles.sectionHeading]}>{t('result.otherMatches')}</Text>
+      <Text style={[typography.small, styles.sectionHint]}>{t('result.pickHint')}</Text>
+
+      {candidates.map((candidate) => {
         const selected = candidate.breed === chosen;
+        const tint = confidenceColor(candidate.confidence);
         return (
           <Pressable
             key={candidate.breed}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
             style={[styles.candidate, selected && styles.candidateSelected]}
             onPress={() => setChosen(candidate.breed)}
           >
-            <View style={styles.candidateRow}>
-              <Text style={[typography.body, selected && styles.candidateSelectedText]}>
-                {localName(candidate.breed)}
-              </Text>
-              <Text style={[typography.small, { color: confidenceColor(candidate.confidence) }]}>
-                {Math.round(candidate.confidence * 100)}%
-              </Text>
+            <Image source={breedImage(candidate.breed)} style={styles.candidateThumb} />
+            <View style={styles.candidateBody}>
+              <View style={styles.candidateRow}>
+                <Text style={[typography.body, selected && styles.candidateSelectedText]}
+                      numberOfLines={1}>
+                  {breedName(candidate.breed)}
+                </Text>
+                <Text style={[styles.candidatePercent, { color: tint }]}>
+                  {Math.round(candidate.confidence * 100)}%
+                </Text>
+              </View>
+              <View style={styles.barTrack}>
+                <View style={[styles.barFill, {
+                  width: `${Math.max(2, candidate.confidence * 100)}%`,
+                  backgroundColor: tint,
+                }]} />
+              </View>
             </View>
-            <View style={styles.barTrack}>
-              <View style={[styles.barFill, {
-                width: `${Math.max(2, candidate.confidence * 100)}%`,
-                backgroundColor: confidenceColor(candidate.confidence),
-              }]} />
-            </View>
+            <Ionicons
+              name={selected ? 'radio-button-on' : 'radio-button-off'}
+              size={22}
+              color={selected ? colors.primary : colors.border}
+            />
           </Pressable>
         );
       })}
 
-      {corrected && <Text style={styles.correction}>{t('result.correctionNote')}</Text>}
+      {!showAll && ranked.length > candidates.length && (
+        <Button
+          variant="quiet"
+          label={t('result.showAll', { count: ranked.length })}
+          onPress={() => setShowAll(true)}
+        />
+      )}
 
-      <Pressable style={[styles.button, styles.primaryButton]} onPress={proceed}>
-        <Text style={styles.primaryButtonText}>{t('result.register')}</Text>
-      </Pressable>
-      <Pressable style={styles.button} onPress={() => navigation.goBack()}>
-        <Text style={styles.buttonText}>{t('result.retake')}</Text>
-      </Pressable>
+      {corrected && (
+        <View style={styles.correction}>
+          <Ionicons name="checkmark-circle" size={18} color={colors.primary} />
+          <Text style={styles.correctionText}>{t('result.correctionNote')}</Text>
+        </View>
+      )}
+
+      <View style={styles.actions}>
+        <Button variant="primary" icon="save-outline"
+                label={t('result.register')} onPress={proceed} />
+        <Button icon="camera-outline"
+                label={t('result.retake')} onPress={() => navigation.goBack()} />
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: spacing.md, gap: spacing.xs, paddingBottom: spacing.xl },
-  photo: { width: '100%', height: 200, borderRadius: radius.md, marginBottom: spacing.md },
-  topBreed: { fontSize: 30, fontWeight: '700', color: colors.text },
-  confidence: { fontSize: 16, fontWeight: '600', marginBottom: spacing.sm },
+  container: { padding: spacing.md, paddingBottom: spacing.xl },
+  hero: {
+    backgroundColor: colors.surface, borderRadius: radius.lg,
+    overflow: 'hidden', marginBottom: spacing.md, ...shadow,
+  },
+  photo: { width: '100%', height: 200, backgroundColor: colors.surfaceMuted },
+  heroBody: { padding: spacing.md, gap: spacing.xs },
+  topBreed: { ...typography.display, marginBottom: spacing.xs },
+  heroPills: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' },
   warning: {
-    backgroundColor: '#fdf6e3', borderColor: colors.warning, borderWidth: 1,
-    borderRadius: radius.sm, padding: spacing.sm, marginBottom: spacing.sm,
+    flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm,
+    backgroundColor: colors.warningSoft, borderRadius: radius.md,
+    padding: spacing.md, marginBottom: spacing.md,
   },
-  warningText: { color: '#7a5c07', fontSize: 15 },
-  sectionHeading: { marginTop: spacing.md, marginBottom: spacing.sm },
+  warningText: { ...typography.small, flex: 1, color: colors.text },
+  sectionHeading: { marginBottom: spacing.xs },
+  sectionHint: { marginBottom: spacing.sm },
   candidate: {
-    borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface,
-    borderRadius: radius.md, padding: spacing.sm, marginBottom: spacing.sm,
-    minHeight: TOUCH_TARGET, justifyContent: 'center',
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: colors.surface, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.border,
+    padding: spacing.sm, marginBottom: spacing.sm,
   },
-  candidateSelected: { borderColor: colors.primary, borderWidth: 2 },
+  candidateSelected: { borderColor: colors.primary, backgroundColor: colors.primarySoft },
+  candidateThumb: {
+    width: 48, height: 48, borderRadius: radius.sm, backgroundColor: colors.surfaceMuted,
+  },
+  candidateBody: { flex: 1, gap: spacing.xs },
+  candidateRow: { flexDirection: 'row', justifyContent: 'space-between', gap: spacing.sm },
   candidateSelectedText: { fontWeight: '700' },
-  candidateRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs },
-  barTrack: { height: 6, borderRadius: 3, backgroundColor: colors.border, overflow: 'hidden' },
+  candidatePercent: { fontSize: 14, fontWeight: '700' },
+  barTrack: {
+    height: 5, borderRadius: 3, backgroundColor: colors.surfaceMuted, overflow: 'hidden',
+  },
   barFill: { height: '100%', borderRadius: 3 },
   correction: {
-    ...typography.small, color: colors.primary, marginTop: spacing.xs, marginBottom: spacing.sm,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: colors.primarySoft, borderRadius: radius.md,
+    padding: spacing.md, marginTop: spacing.xs,
   },
-  button: {
-    minHeight: TOUCH_TARGET, borderRadius: radius.md, borderWidth: 1,
-    borderColor: colors.border, backgroundColor: colors.surface,
-    alignItems: 'center', justifyContent: 'center', marginTop: spacing.sm,
-  },
-  primaryButton: { backgroundColor: colors.primary, borderColor: colors.primary },
-  buttonText: { ...typography.body, fontWeight: '600' },
-  primaryButtonText: { color: colors.primaryText, fontSize: 16, fontWeight: '700' },
+  correctionText: { ...typography.small, flex: 1, color: colors.text },
+  actions: { gap: spacing.sm, marginTop: spacing.lg },
 });
