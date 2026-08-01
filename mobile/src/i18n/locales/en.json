@@ -1,9 +1,12 @@
 {
-  "app": { "name": "Cattleman", "tagline": "Identify Indian cattle and buffalo breeds" },
+  "app": {
+    "name": "Cattleman",
+    "tagline": "Identify Indian cattle and buffalo breeds"
+  },
   "nav": {
     "capture": "Identify",
     "registry": "Registry",
-    "guide": "Breed guide",
+    "guide": "Guide",
     "settings": "Settings"
   },
   "capture": {
@@ -11,17 +14,21 @@
     "instructions": "Photograph the animal from the side, with the whole body in frame.",
     "takePhoto": "Take photo",
     "choosePhoto": "Choose from gallery",
+    "retake": "Retake",
+    "gallery": "Gallery",
+    "identify": "Identify breed",
     "analysing": "Identifying breed…",
-    "permissionNeeded": "Camera access is needed to photograph the animal.",
-    "grantPermission": "Allow camera"
+    "tip": "Good light and a clear side view give the best result. A photo taken from behind rarely does.",
+    "permissionNeeded": "Camera access is needed to photograph the animal."
   },
   "result": {
     "title": "Result",
     "topMatch": "Most likely breed",
     "otherMatches": "Other possibilities",
+    "pickHint": "Tap a breed to choose it instead. The photos are reference pictures.",
+    "showAll": "Show all {{count}} breeds",
     "confidence": "{{percent}}% confident",
     "lowConfidence": "The model is unsure. Check the alternatives before saving.",
-    "notListed": "None of these — choose manually",
     "register": "Register this animal",
     "retake": "Retake photo",
     "correctionNote": "You changed the breed. This correction is saved to improve the model."
@@ -32,27 +39,51 @@
     "tagIdHint": "Ear tag or local identifier",
     "ownerName": "Owner name",
     "notes": "Notes",
-    "location": "Location",
     "locationCaptured": "Location captured",
     "locationUnavailable": "Location unavailable",
     "save": "Save registration",
     "saved": "Registered. It will sync when you are online.",
+    "offlineNote": "Saved on this phone first, so registering works with no signal.",
     "breed": "Breed"
   },
   "registry": {
     "title": "Registered animals",
-    "empty": "No animals registered yet.",
+    "empty": "No animals registered yet",
+    "emptyHint": "Identify an animal and it will appear here.",
+    "total": "{{count}} registered",
+    "noTag": "No tag number",
+    "synced": "Synced",
+    "queued": "Queued",
     "pending": "{{count}} waiting to sync",
     "allSynced": "All records synced",
     "syncNow": "Sync now",
     "syncing": "Syncing…",
-    "syncFailed": "Sync failed. It will retry automatically.",
     "distribution": "Breeds registered"
   },
   "guide": {
     "title": "Breed guide",
     "search": "Search breeds",
-    "origin": "Origin",
+    "filter": {
+      "all": "All",
+      "cattle": "Cattle",
+      "buffalo": "Buffalo"
+    },
+    "noResults": "No breed matches that search.",
+    "collapse": "Collapse",
+    "origins": {
+      "gujarat": "Gujarat",
+      "haryana": "Haryana",
+      "maharashtra": "Maharashtra",
+      "punjab": "Punjab",
+      "rajasthan": "Rajasthan",
+      "sindh": "Sindh",
+      "andhraPradesh": "Andhra Pradesh"
+    },
+    "purposes": {
+      "dairy": "Dairy",
+      "draught": "Draught",
+      "dual": "Draught and dairy"
+    },
     "purpose": "Purpose",
     "milkYield": "Milk yield",
     "milkYieldValue": "{{litres}} litres per lactation",
@@ -65,14 +96,24 @@
     "title": "Settings",
     "language": "Language",
     "serverUrl": "Server address",
+    "serverHint": "Where registrations are uploaded once you are online.",
     "about": "About",
-    "modelVersion": "Model version",
+    "modelVersion": "Model",
+    "breedCount": "Breeds supported",
     "pendingRecords": "Records awaiting sync"
   },
+  "model": {
+    "idle": "Preparing the model…",
+    "runtime": "Starting the model…",
+    "downloading": "Downloading the model… {{percent}}%",
+    "downloadingUnknown": "Downloading the model…",
+    "preparing": "Preparing the model…",
+    "downloadedOf": "{{done}} MB of {{total}} MB",
+    "oneTime": "This happens once. Identifying works normally after it.",
+    "failed": "The model could not be loaded"
+  },
   "common": {
-    "cancel": "Cancel",
-    "retry": "Retry",
-    "close": "Close",
-    "error": "Something went wrong"
+    "error": "Something went wrong",
+    "retry": "Retry"
   }
 }
