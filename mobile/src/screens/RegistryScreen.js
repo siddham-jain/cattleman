@@ -1,14 +1,19 @@
 import { useCallback, useState } from 'react';
 import {
-  FlatList, Pressable, RefreshControl, StyleSheet, Text, View,
+  FlatList, Image, RefreshControl, StyleSheet, Text, View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { breedDistribution, countPending, listAnimals } from '../db/database';
 import { syncNow } from '../sync/sync';
 import { i18n, t } from '../i18n';
-import breedInfo from '../../assets/breeds.json';
-import { colors, radius, spacing, TOUCH_TARGET, typography } from '../theme';
+import { breedImage, breedName } from '../breeds';
+import Button from '../components/Button';
+import Pill from '../components/Pill';
+import {
+  animalTypeColor, colors, radius, shadow, spacing, typography,
+} from '../theme';
 
 export default function RegistryScreen() {
   const [animals, setAnimals] = useState([]);
@@ -38,10 +43,7 @@ export default function RegistryScreen() {
     }
   }
 
-  function localName(breed) {
-    const names = breedInfo[breed]?.names;
-    return names?.[i18n.locale] ?? names?.en ?? breed;
-  }
+  const busiest = distribution[0]?.total ?? 1;
 
   return (
     <FlatList
@@ -51,53 +53,77 @@ export default function RegistryScreen() {
       refreshControl={<RefreshControl refreshing={syncing} onRefresh={runSync} />}
       ListHeaderComponent={
         <View>
-          <View style={styles.statusRow}>
-            <Text style={typography.small}>
-              {pending > 0 ? t('registry.pending', { count: pending }) : t('registry.allSynced')}
-            </Text>
-            <Pressable style={styles.syncButton} onPress={runSync} disabled={syncing}>
-              <Text style={styles.syncText}>
-                {syncing ? t('registry.syncing') : t('registry.syncNow')}
+          <View style={styles.statusCard}>
+            <Ionicons
+              name={pending > 0 ? 'cloud-upload-outline' : 'cloud-done-outline'}
+              size={22}
+              color={pending > 0 ? colors.warning : colors.primary}
+            />
+            <View style={styles.statusText}>
+              <Text style={typography.heading}>
+                {pending > 0 ? t('registry.pending', { count: pending }) : t('registry.allSynced')}
               </Text>
-            </Pressable>
+              <Text style={typography.small}>{t('registry.total', { count: animals.length })}</Text>
+            </View>
+            <Button
+              variant={pending > 0 ? 'primary' : 'secondary'}
+              label={syncing ? t('registry.syncing') : t('registry.syncNow')}
+              busy={syncing}
+              onPress={runSync}
+            />
           </View>
 
           {distribution.length > 0 && (
             <View style={styles.distribution}>
-              <Text style={[typography.heading, styles.distributionTitle]}>
-                {t('registry.distribution')}
-              </Text>
+              <Text style={typography.label}>{t('registry.distribution')}</Text>
               {distribution.map((row) => (
                 <View key={`${row.breed}-${row.animal_type}`} style={styles.distributionRow}>
-                  <View style={[styles.dot, {
-                    backgroundColor: row.animal_type === 'buffalo' ? colors.buffalo : colors.cattle,
-                  }]} />
-                  <Text style={styles.distributionName}>{localName(row.breed)}</Text>
-                  <Text style={typography.small}>{row.total}</Text>
+                  <Text style={styles.distributionName} numberOfLines={1}>
+                    {breedName(row.breed)}
+                  </Text>
+                  <View style={styles.distributionTrack}>
+                    <View style={[styles.distributionFill, {
+                      width: `${Math.max(6, (row.total / busiest) * 100)}%`,
+                      backgroundColor: animalTypeColor(row.animal_type),
+                    }]} />
+                  </View>
+                  <Text style={styles.distributionCount}>{row.total}</Text>
                 </View>
               ))}
             </View>
           )}
         </View>
       }
-      ListEmptyComponent={<Text style={styles.empty}>{t('registry.empty')}</Text>}
+      ListEmptyComponent={
+        <View style={styles.empty}>
+          <Ionicons name="albums-outline" size={40} color={colors.textMuted} />
+          <Text style={typography.heading}>{t('registry.empty')}</Text>
+          <Text style={[typography.small, styles.emptyHint]}>{t('registry.emptyHint')}</Text>
+        </View>
+      }
       renderItem={({ item }) => (
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={typography.heading}>{localName(item.breed)}</Text>
-            <View style={[styles.badge, {
-              backgroundColor: item.synced_at ? colors.success : colors.warning,
-            }]}>
-              <Text style={styles.badgeText}>
-                {item.synced_at ? '✓' : '⟳'}
-              </Text>
-            </View>
+          <Image
+            source={item.photo_uri ? { uri: item.photo_uri } : breedImage(item.breed)}
+            style={styles.thumb}
+            resizeMode="cover"
+          />
+          <View style={styles.cardBody}>
+            <Text style={typography.heading} numberOfLines={1}>{breedName(item.breed)}</Text>
+            <Text style={typography.small} numberOfLines={1}>
+              {[item.tag_id, item.owner_name].filter(Boolean).join(' · ') || t('registry.noTag')}
+            </Text>
+            <Text style={typography.small}>
+              {new Date(item.created_at).toLocaleDateString(i18n.locale, {
+                day: 'numeric', month: 'short', year: 'numeric',
+              })}
+            </Text>
           </View>
-          {item.tag_id ? <Text style={typography.small}>{item.tag_id}</Text> : null}
-          {item.owner_name ? <Text style={typography.small}>{item.owner_name}</Text> : null}
-          <Text style={styles.timestamp}>
-            {new Date(item.created_at).toLocaleString(i18n.locale)}
-          </Text>
+          <Pill
+            label={item.synced_at ? t('registry.synced') : t('registry.queued')}
+            color={item.synced_at ? colors.primary : colors.warning}
+            icon={item.synced_at ? 'checkmark' : 'time-outline'}
+          />
         </View>
       )}
     />
@@ -106,37 +132,34 @@ export default function RegistryScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: spacing.md, paddingBottom: spacing.xl },
-  statusRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginBottom: spacing.md,
+  statusCard: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: colors.surface, borderRadius: radius.lg,
+    padding: spacing.md, marginBottom: spacing.md, ...shadow,
   },
-  syncButton: {
-    minHeight: TOUCH_TARGET, paddingHorizontal: spacing.md, justifyContent: 'center',
-    borderRadius: radius.md, backgroundColor: colors.primary,
-  },
-  syncText: { color: colors.primaryText, fontWeight: '700', fontSize: 15 },
+  statusText: { flex: 1, gap: 2 },
   distribution: {
-    backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1,
-    borderColor: colors.border, padding: spacing.md, marginBottom: spacing.md,
+    backgroundColor: colors.surface, borderRadius: radius.lg,
+    padding: spacing.md, marginBottom: spacing.md, gap: spacing.sm, ...shadow,
   },
-  distributionTitle: { marginBottom: spacing.sm },
-  distributionRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xs,
+  distributionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  distributionName: { ...typography.small, color: colors.text, width: 96 },
+  distributionTrack: {
+    flex: 1, height: 8, borderRadius: 4,
+    backgroundColor: colors.surfaceMuted, overflow: 'hidden',
   },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  distributionName: { ...typography.body, flex: 1 },
+  distributionFill: { height: '100%', borderRadius: 4 },
+  distributionCount: { ...typography.small, color: colors.text, fontWeight: '700', minWidth: 20,
+    textAlign: 'right' },
   card: {
-    backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1,
-    borderColor: colors.border, padding: spacing.md, marginBottom: spacing.sm,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    backgroundColor: colors.surface, borderRadius: radius.lg,
+    padding: spacing.sm, marginBottom: spacing.sm, ...shadow,
   },
-  cardHeader: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginBottom: spacing.xs,
+  thumb: {
+    width: 60, height: 60, borderRadius: radius.md, backgroundColor: colors.surfaceMuted,
   },
-  badge: {
-    width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center',
-  },
-  badgeText: { color: colors.primaryText, fontSize: 13, fontWeight: '700' },
-  timestamp: { ...typography.small, marginTop: spacing.xs },
-  empty: { ...typography.small, textAlign: 'center', marginTop: spacing.xl },
+  cardBody: { flex: 1, gap: 2 },
+  empty: { alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl },
+  emptyHint: { textAlign: 'center', maxWidth: 260 },
 });
