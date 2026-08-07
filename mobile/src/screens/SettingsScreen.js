@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import {
   Pressable, ScrollView, StyleSheet, Text, TextInput, View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { SUPPORTED_LOCALES, i18n, setLocale, t } from '../i18n';
 import { getServerUrl, queueStatus, setServerUrl } from '../sync/sync';
 import modelMetadata from '../../assets/model/cattleman.json';
-import { colors, radius, spacing, TOUCH_TARGET, typography } from '../theme';
+import {
+  colors, radius, shadow, spacing, TOUCH_TARGET, typography,
+} from '../theme';
 
-export default function SettingsScreen({ navigation }) {
+export default function SettingsScreen() {
   const [locale, setLocaleState] = useState(i18n.locale);
   const [server, setServer] = useState('');
   const [queue, setQueue] = useState({ queued: 0, stuck: 0 });
@@ -19,73 +22,100 @@ export default function SettingsScreen({ navigation }) {
   }, []);
 
   async function chooseLocale(code) {
-    await setLocale(code);
     setLocaleState(code);
-    // Screen titles are read at render time from the navigator options, so the
-    // stack has to be re-rendered for a language change to take effect.
-    navigation.reset({ index: 0, routes: [{ name: 'Capture' }] });
+    await setLocale(code);
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={[typography.heading, styles.sectionTitle]}>{t('settings.language')}</Text>
-      {SUPPORTED_LOCALES.map((option) => (
-        <Pressable
-          key={option.code}
-          style={[styles.option, locale === option.code && styles.optionSelected]}
-          onPress={() => chooseLocale(option.code)}
-        >
-          <Text style={[typography.body, locale === option.code && styles.optionSelectedText]}>
-            {option.label}
-          </Text>
-          {locale === option.code && <Text style={styles.check}>✓</Text>}
-        </Pressable>
-      ))}
+      <Section title={t('settings.language')} icon="language-outline">
+        {SUPPORTED_LOCALES.map((option, index) => {
+          const selected = locale === option.code;
+          return (
+            <Pressable
+              key={option.code}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              style={[styles.row, index > 0 && styles.rowDivided]}
+              onPress={() => chooseLocale(option.code)}
+            >
+              <Text style={[typography.body, selected && styles.rowSelected]}>
+                {option.label}
+              </Text>
+              {selected && <Ionicons name="checkmark" size={20} color={colors.primary} />}
+            </Pressable>
+          );
+        })}
+      </Section>
 
-      <Text style={[typography.heading, styles.sectionTitle]}>{t('settings.serverUrl')}</Text>
-      <TextInput
-        style={styles.input}
-        value={server}
-        onChangeText={setServer}
-        onBlur={() => setServerUrl(server)}
-        autoCapitalize="none"
-        keyboardType="url"
-      />
+      <Section title={t('settings.serverUrl')} icon="server-outline">
+        <View style={styles.inputBlock}>
+          <TextInput
+            style={styles.input}
+            value={server}
+            onChangeText={setServer}
+            onBlur={() => setServerUrl(server)}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+            placeholderTextColor={colors.textMuted}
+          />
+          <Text style={typography.small}>{t('settings.serverHint')}</Text>
+        </View>
+      </Section>
 
-      <Text style={[typography.heading, styles.sectionTitle]}>{t('settings.about')}</Text>
-      <View style={styles.infoRow}>
-        <Text style={typography.small}>{t('settings.modelVersion')}</Text>
-        <Text style={typography.body}>
-          {modelMetadata.arch} · {modelMetadata.classes.length} breeds
-        </Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={typography.small}>{t('settings.pendingRecords')}</Text>
-        <Text style={typography.body}>{queue.queued}</Text>
-      </View>
+      <Section title={t('settings.about')} icon="information-circle-outline">
+        <InfoRow label={t('settings.modelVersion')} value={modelMetadata.arch} />
+        <InfoRow label={t('settings.breedCount')}
+                 value={String(modelMetadata.classes.length)} divided />
+        <InfoRow label={t('settings.pendingRecords')} value={String(queue.queued)} divided />
+      </Section>
     </ScrollView>
+  );
+}
+
+function Section({ title, icon, children }) {
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Ionicons name={icon} size={16} color={colors.textMuted} />
+        <Text style={typography.label}>{title}</Text>
+      </View>
+      <View style={styles.card}>{children}</View>
+    </View>
+  );
+}
+
+function InfoRow({ label, value, divided }) {
+  return (
+    <View style={[styles.row, divided && styles.rowDivided]}>
+      <Text style={typography.body}>{label}</Text>
+      <Text style={[typography.small, styles.infoValue]}>{value}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { padding: spacing.md, paddingBottom: spacing.xl },
-  sectionTitle: { marginTop: spacing.lg, marginBottom: spacing.sm },
-  option: {
+  section: { marginBottom: spacing.lg },
+  sectionHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginBottom: spacing.sm,
+  },
+  card: {
+    backgroundColor: colors.surface, borderRadius: radius.lg,
+    paddingHorizontal: spacing.md, ...shadow,
+  },
+  row: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    minHeight: TOUCH_TARGET, paddingHorizontal: spacing.md,
-    borderWidth: 1, borderColor: colors.border, borderRadius: radius.md,
-    backgroundColor: colors.surface, marginBottom: spacing.sm,
+    minHeight: TOUCH_TARGET, gap: spacing.sm,
   },
-  optionSelected: { borderColor: colors.primary, borderWidth: 2 },
-  optionSelectedText: { fontWeight: '700' },
-  check: { color: colors.primary, fontSize: 18, fontWeight: '700' },
+  rowDivided: { borderTopWidth: 1, borderTopColor: colors.border },
+  rowSelected: { fontWeight: '700', color: colors.primary },
+  inputBlock: { paddingVertical: spacing.md, gap: spacing.sm },
   input: {
-    minHeight: TOUCH_TARGET, borderWidth: 1, borderColor: colors.border,
-    borderRadius: radius.md, backgroundColor: colors.surface,
-    paddingHorizontal: spacing.sm, fontSize: 16, color: colors.text,
+    minHeight: TOUCH_TARGET, fontSize: 16, color: colors.text,
+    borderWidth: 1, borderColor: colors.border, borderRadius: radius.md,
+    backgroundColor: colors.background, paddingHorizontal: spacing.md,
   },
-  infoRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.border,
-  },
+  infoValue: { color: colors.text, fontWeight: '600' },
 });
