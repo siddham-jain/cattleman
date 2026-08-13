@@ -21,6 +21,10 @@ ml/models/
 *.onnx
 mobile/node_modules/
 
+# Staged at runtime by mobile/scripts/web-assets.mjs from node_modules and assets/
+mobile/public/
+mobile/.expo/
+
 # The shipped model is the exception. It is committed so a clone builds and runs
 # without first downloading 1,390 images and retraining; 17 MB is a fair price
 # for the app working out of the box. Rebuild it with ml/export_onnx.py.
