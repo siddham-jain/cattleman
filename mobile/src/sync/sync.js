@@ -10,6 +10,7 @@
  * server already has is a no-op upsert, so a response lost in transit costs one
  * duplicate request rather than a duplicate animal.
  */
+import { Platform } from 'react-native';
 import * as Network from 'expo-network';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
@@ -23,7 +24,11 @@ const BATCH_SIZE = 20;
 
 export async function getServerUrl() {
   const stored = await AsyncStorage.getItem(SERVER_KEY);
-  return stored || Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:8000';
+  if (stored) return stored;
+  // The configured default is the emulator's alias for the host machine, which
+  // means nothing in a browser — there the API is just on localhost.
+  if (Platform.OS === 'web') return 'http://localhost:8000';
+  return Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:8000';
 }
 
 export async function setServerUrl(url) {
