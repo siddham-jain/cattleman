@@ -60,11 +60,42 @@ editor, or agent can pick up with full context.
 - `frontend/` (React web app), `test_result.md`, `image_testing.md`, `README_CATTLE_RECOGNITION.md`.
 - `ml/imagehash.py` — perceptual hashing could not separate same-breed from different-breed pairs.
 
+### Decisions
+- The web build streams the graph itself instead of handing ONNX Runtime a URL. A byte count is
+  the only way to tell someone how far along a 17 MB download on a field connection is.
+- Progress falls back to the size in the model metadata: the dev server sends the graph brotli
+  encoded and chunked, so no Content-Length reaches JS.
+- The loading card waits 600 ms before appearing. Loading off a phone's own bundle takes a few
+  hundred milliseconds, and without the delay the common case is a flash that shoves the buttons
+  down. A failure still shows at once.
+- onnxruntime-web is loaded by `<script>` from `public/`, not imported: Metro's Babel pass rejects
+  its dynamic `import()`. Same reason sql.js is loaded that way, so the two now match.
+- The web build fetches the 30 MB of graph and runtime in the background at startup, so every
+  other screen is usable immediately and the browser caches it thereafter. Measured: ready in
+  0.6 s on localhost, 31 s on 4G, 175 s on 3G — which is what the loading indicator is for.
+- Type uses the platform font. A bundled display face would sharpen English and render tofu in
+  Hindi and Marathi, which is two of the three supported languages.
+- The tab bar draws its own icon-and-label stack; the navigator's label slot clips a 12sp line.
+- The guide photo is `contain`, not `cover` — a crop cuts the horns and back line, which are the
+  features the text underneath asks the reader to check.
+- Native-only modules are swapped by a Metro resolver alias rather than by forking screens, so the
+  screens, store, and sync loop running in the browser are the same code the phone runs.
+
 ---
 
 ## Work Log
 
 Chronological notes for cross-session context. Newest first.
+
+### 2026-08-15 — Interface rebuild and honest web inference
+- **What:** Tab navigation, a shared design system, breed photos in the guide, and real ONNX
+  inference on web replacing the demo fixture.
+- **Why:** The screens had grown one at a time and read like a form; the guide asked people to
+  match an animal against text alone.
+- **State:** Whole flow exercised in a browser — a held-out Gir photo returns Red Sindhi at 47%
+  with the low-confidence warning, which is the model being honest rather than a fixture.
+- **Notes:** The label on the tab bar had to be drawn by hand; react-navigation sizes its own label
+  slot to a height that clips descenders, and Devanagari is taller than Latin at the same size.
 
 ### 2026-07-16 — Polish and documentation
 - **What:** Breed guide and settings screens, lifespan migration, README and API docs rewritten.
