@@ -29,3 +29,8 @@ mobile/.expo/
 # without first downloading 1,390 images and retraining; 17 MB is a fair price
 # for the app working out of the box. Rebuild it with ml/export_onnx.py.
 !mobile/assets/model/cattleman.onnx
+
+# The report and the demo deck are submission artefacts, not source. The ADRs
+# under docs/adr/ stay in the repo; those are decisions the code depends on.
+docs/report/
+*.pptx
